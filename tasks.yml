@@ -40,3 +40,27 @@
   priority: 4
   status: done
 
+- id: 5
+  description: Implement Orchestrator skeleton
+  component: orchestrator
+  dependencies: []
+  priority: 1
+  status: done
+- id: 6
+  description: Introduce Memory module
+  component: core
+  dependencies: [5]
+  priority: 2
+  status: done
+- id: 7
+  description: Provide CLI entrypoint
+  component: cli
+  dependencies: [5, 6]
+  priority: 3
+  status: done
+- id: 8
+  description: Expand bootstrap error tests
+  component: testing
+  dependencies: [2]
+  priority: 4
+  status: done
