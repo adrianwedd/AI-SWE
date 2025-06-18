@@ -4,7 +4,7 @@ import pytest
 
 
 def test_artifacts_exist():
-    required = ["ARCHITECTURE.md", "tasks.yml", "requirements.txt"]
+    required = ["ARCHITECTURE.md", "tasks.yml", "requirements.txt", "AGENTS.md"]
     for fname in required:
         assert Path(fname).exists(), f"{fname} not found"
 
