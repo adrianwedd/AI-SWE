@@ -157,15 +157,21 @@ refactor suggestion.
 
 ```python
 class SelfAuditor:
-    def __init__(self, threshold: int = 15, use_wily: bool = False):
-        self.threshold = threshold
+    def __init__(
+        self,
+        complexity_threshold: int = 15,
+        maintainability_threshold: str = "B",
+        use_wily: bool = False,
+    ):
+        self.complexity_threshold = complexity_threshold
+        self.maintainability_threshold = maintainability_threshold
         self.use_wily = use_wily
 
     def analyze(self, paths):
         """Return a mapping of file paths to radon metrics."""
 
     def audit(self, tasks):
-        """Return new task entries when complexity exceeds ``self.threshold``."""
+        """Return new task entries when metrics exceed configured thresholds."""
 ```
 
 When ``use_wily`` is enabled the auditor runs ``wily build`` to update the
