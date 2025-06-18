@@ -297,7 +297,6 @@
   status: pending
 - id: 46
   description: Refactor tests/test_executor.py complexity 13
-
   component: core
   dependencies: []
   priority: 3
@@ -326,3 +325,37 @@
   dependencies: []
   priority: 3
   status: pending
+- id: 51
+  description: Clean up 5 duplicate tasks
+  component: maintenance
+  dependencies: []
+  priority: 2
+  status: pending
+  metadata:
+    type: technical_debt
+    generated_by: Reflector
+    decision_type: task_cleanup
+    details:
+      type: task_cleanup
+      reason: Duplicate tasks detected
+      duplicates:
+      - description: Refactor core/reflector.py complexity 24
+        task_ids:
+        - 33
+        - 50
+      - description: Refactor core/bootstrap.py complexity 15
+        task_ids:
+        - 34
+        - 47
+      - description: Refactor core/orchestrator.py complexity 13
+        task_ids:
+        - 35
+        - 49
+      - description: Refactor tests/test_bootstrap.py complexity 12
+        task_ids:
+        - 38
+        - 44
+      - description: Refactor tests/test_executor.py complexity 13
+        task_ids:
+        - 37
+        - 46
