@@ -1,20 +1,3 @@
-# jsonschema: |
-#   {
-#     "$schema": "http://json-schema.org/draft-07/schema#",
-#     "type": "array",
-#     "items": {
-#       "type": "object",
-#       "required": ["id","description","component","dependencies","priority","status"],
-#       "properties": {
-#         "id": {"type": "integer"},
-#         "description": {"type": "string"},
-#         "component": {"type": "string"},
-#         "dependencies": {"type": "array","items":{"type":"integer"}},
-#         "priority": {"type": "integer","minimum":1,"maximum":5},
-#         "status": {"type":"string","enum":["pending","in_progress","done"]}
-#       }
-#     }
-#   }
 - id: 1
   description: Implement YAML validation using jsonschema
   component: bootstrap
@@ -24,7 +7,8 @@
 - id: 2
   description: Expand tests in tests/test_bootstrap.py
   component: testing
-  dependencies: [1]
+  dependencies:
+  - 1
   priority: 2
   status: done
 - id: 3
@@ -36,10 +20,10 @@
 - id: 4
   description: Ensure tests check for AGENTS.md existence
   component: testing
-  dependencies: [3]
+  dependencies:
+  - 3
   priority: 4
   status: done
-
 - id: 5
   description: Implement Orchestrator skeleton
   component: orchestrator
@@ -49,19 +33,23 @@
 - id: 6
   description: Introduce Memory module
   component: core
-  dependencies: [5]
+  dependencies:
+  - 5
   priority: 2
   status: done
 - id: 7
   description: Provide CLI entrypoint
   component: cli
-  dependencies: [5, 6]
+  dependencies:
+  - 5
+  - 6
   priority: 3
   status: done
 - id: 8
   description: Expand bootstrap error tests
   component: testing
-  dependencies: [2]
+  dependencies:
+  - 2
   priority: 4
   status: done
 - id: 9
@@ -69,73 +57,87 @@
   component: auditor
   dependencies: []
   priority: 2
-  status: in_progress
+  status: done
 - id: 12
   description: Add radon dependency to requirements
   component: auditor
-  dependencies: [9]
+  dependencies:
+  - 9
   priority: 2
   status: done
 - id: 13
   description: Implement analyze() in SelfAuditor using radon APIs
   component: auditor
-  dependencies: [12]
+  dependencies:
+  - 12
   priority: 2
-  status: pending
+  status: done
 - id: 14
   description: Implement audit() generating refactor tasks when thresholds exceeded
   component: auditor
-  dependencies: [13]
+  dependencies:
+  - 13
   priority: 3
-  status: pending
+  status: done
 - id: 15
   description: Add unit tests for SelfAuditor analyze and audit methods
   component: testing
-  dependencies: [14]
+  dependencies:
+  - 14
   priority: 3
-  status: pending
+  status: done
 - id: 10
   description: Integrate wily history tracking into SelfAuditor
   component: auditor
-  dependencies: [9]
+  dependencies:
+  - 9
   priority: 3
   status: pending
 - id: 11
   description: Orchestrator generates refactor tasks when SelfAuditor thresholds exceeded
   component: orchestrator
-  dependencies: [9]
+  dependencies:
+  - 9
   priority: 2
   status: pending
 - id: 16
   description: Document Reflector component and self-improvement loop in ARCHITECTURE.md
   component: docs
-  dependencies: [5]
+  dependencies:
+  - 5
   priority: 2
-  status: pending
+  status: done
 - id: 17
-  description: Add Reflector class skeleton with reflect, analyze, decide, execute and validate methods
+  description: Add Reflector class skeleton with reflect, analyze, decide, execute
+    and validate methods
   component: reflector
-  dependencies: [16]
+  dependencies:
+  - 16
   priority: 2
   status: pending
 - id: 18
-  description: Implement decision logic in Reflector to update tasks.yml based on analysis
+  description: Implement decision logic in Reflector to update tasks.yml based on
+    analysis
   component: reflector
-  dependencies: [17]
+  dependencies:
+  - 17
   priority: 3
-  status: pending
+  status: done
 - id: 19
   description: Integrate Reflector into Orchestrator run loop
   component: orchestrator
-  dependencies: [17]
+  dependencies:
+  - 17
   priority: 3
-  status: pending
+  status: done
 - id: 20
   description: Add unit tests for Reflector and its orchestration integration
   component: testing
-  dependencies: [18, 19]
+  dependencies:
+  - 18
+  - 19
   priority: 3
-  status: pending
+  status: done
 - id: 21
   description: Remove duplicate entries and complete missing fields in tasks.yml
   component: docs
@@ -181,12 +183,208 @@
 - id: 28
   description: Implement analyze() in SelfAuditor using radon
   component: code
-  dependencies: [13]
+  dependencies:
+  - 13
   priority: 3
   status: done
 - id: 29
   description: Add tests covering SelfAuditor.analyze and audit
   component: tests
-  dependencies: [28]
+  dependencies:
+  - 28
   priority: 3
   status: done
+- id: 30
+  description: Add load_tasks and save_tasks methods to Memory for YAML task persistence
+  component: core
+  dependencies: []
+  priority: 2
+  status: done
+- id: 31
+  description: Print 'Orchestrator running' message from CLI main
+  component: cli
+  dependencies:
+  - 30
+  priority: 3
+  status: done
+- id: 32
+  description: Ensure CLI integration test passes with new Memory methods
+  component: tests
+  dependencies:
+  - 31
+  priority: 3
+  status: done
+- id: 33
+  description: Refactor core/reflector.py complexity 24
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 34
+  description: Refactor core/bootstrap.py complexity 15
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 35
+  description: Refactor core/orchestrator.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 36
+  description: Refactor core/planner.py complexity 35
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 37
+  description: Refactor tests/test_executor.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 38
+  description: Refactor tests/test_bootstrap.py complexity 12
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 39
+  description: Refactor tests/test_planner.py complexity 23
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 40
+  description: Refactor core/reflector.py complexity 24
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 41
+  description: Refactor core/bootstrap.py complexity 15
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 42
+  description: Refactor core/orchestrator.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 43
+  description: Refactor core/planner.py complexity 35
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 44
+  description: Refactor tests/test_executor.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 45
+  description: Refactor tests/test_bootstrap.py complexity 12
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 46
+  description: Refactor tests/test_planner.py complexity 23
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 47
+  description: Refactor core/reflector.py complexity 24
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 48
+  description: Refactor core/bootstrap.py complexity 15
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 49
+  description: Refactor core/orchestrator.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 50
+  description: Refactor core/planner.py complexity 35
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 51
+  description: Refactor tests/test_executor.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 52
+  description: Refactor tests/test_bootstrap.py complexity 12
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 53
+  description: Refactor tests/test_planner.py complexity 23
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 54
+  description: Refactor core/self_auditor.py complexity 16
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 55
+  description: Refactor core/bootstrap.py complexity 15
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 56
+  description: Refactor core/orchestrator.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 57
+  description: Refactor core/reflector.py complexity 24
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 58
+  description: Refactor core/planner.py complexity 35
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 59
+  description: Refactor tests/test_planner.py complexity 23
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 60
+  description: Refactor tests/test_executor.py complexity 13
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 61
+  description: Refactor tests/test_bootstrap.py complexity 12
+  component: core
+  dependencies: []
+  priority: 3
+  status: pending

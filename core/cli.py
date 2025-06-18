@@ -5,6 +5,9 @@ from pathlib import Path
 
 from .orchestrator import Orchestrator
 from .memory import Memory
+from .planner import Planner
+from .executor import Executor
+from .reflector import Reflector
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,7 +27,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     memory = Memory(Path(args.memory))
-    orchestrator = Orchestrator(None, None, None, memory)
+    planner = Planner()
+    executor = Executor()
+    reflector = Reflector()
+    orchestrator = Orchestrator(planner, executor, reflector, memory)
+    print("Orchestrator running")
     orchestrator.run()
 
 

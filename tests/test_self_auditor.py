@@ -6,10 +6,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from core.self_auditor import SelfAuditor  # noqa: E402
 
 
-def test_self_auditor_audit():
-    auditor = SelfAuditor()
-    result = auditor.audit()
-    assert result is None
+def test_self_auditor_audit_creates_tasks(tmp_path):
+    target = tmp_path / "complex.py"
+    target.write_text(
+        "def foo(x):\n    if x > 0:\n        if x > 1:\n            return 1\n        return 2\n    return 3\n"
+    )
+    auditor = SelfAuditor(threshold=1)
+    tasks = auditor.audit(tmp_path)
+    assert tasks
+    assert tasks[0]["description"].startswith("Refactor")
 
 
 def test_self_auditor_analyze(tmp_path):
