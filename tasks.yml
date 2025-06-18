@@ -136,3 +136,21 @@
   dependencies: [18, 19]
   priority: 3
   status: pending
+- id: 21
+  description: Remove duplicate entries and complete missing fields in tasks.yml
+  component: docs
+  dependencies: []
+  priority: 2
+  status: done
+- id: 22
+  description: Fix flake8 lint errors across code and tests
+  component: code
+  dependencies: []
+  priority: 3
+  status: done
+- id: 23
+  description: Increase test coverage for bootstrap functions
+  component: tests
+  dependencies: []
+  priority: 3
+  status: done
