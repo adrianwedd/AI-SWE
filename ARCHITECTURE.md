@@ -96,6 +96,21 @@ class SelfAuditor:
         are exceeded."""
 ```
 
+### Reflector
+Coordinates the self-improvement loop by examining repository state and
+invoking the `Orchestrator` to apply changes. It performs reflection,
+analysis, decision making, execution and validation steps.
+
+```python
+class Reflector:
+    def __init__(self, orchestrator):
+        self.orchestrator = orchestrator
+
+    def cycle(self):
+        """Run one reflect-analyze-decide-execute iteration."""
+        pass
+```
+
 ## Bootstrapping Flow
 ```mermaid
 flowchart TD

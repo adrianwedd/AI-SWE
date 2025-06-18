@@ -106,3 +106,33 @@
   dependencies: [9]
   priority: 2
   status: pending
+- id: 16
+  description: Document Reflector component and self-improvement loop in ARCHITECTURE.md
+  component: docs
+  dependencies: [5]
+  priority: 2
+  status: pending
+- id: 17
+  description: Add Reflector class skeleton with reflect, analyze, decide, execute and validate methods
+  component: reflector
+  dependencies: [16]
+  priority: 2
+  status: pending
+- id: 18
+  description: Implement decision logic in Reflector to update tasks.yml based on analysis
+  component: reflector
+  dependencies: [17]
+  priority: 3
+  status: pending
+- id: 19
+  description: Integrate Reflector into Orchestrator run loop
+  component: orchestrator
+  dependencies: [17]
+  priority: 3
+  status: pending
+- id: 20
+  description: Add unit tests for Reflector and its orchestration integration
+  component: testing
+  dependencies: [18, 19]
+  priority: 3
+  status: pending
