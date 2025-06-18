@@ -3,20 +3,44 @@
 ## Components
 
 ### Orchestrator
+Coordinates the main control loop. It loads persistent state from
+`Memory`, asks the `Planner` for the next action, executes it via the
+`Executor` and finally allows the `SelfAuditor` to inspect results. The
+class simply wires these components together and exposes a `run()`
+method that will later contain the orchestration logic.
+
 ```python
 class Orchestrator:
     def __init__(self, planner, executor, auditor, memory):
-        pass
+        self.planner = planner
+        self.executor = executor
+        self.auditor = auditor
+        self.memory = memory
+
     def run(self):
+        """Entry point for the orchestration loop."""
         pass
 ```
 
 ### Memory
+Simple persistence helper for storing JSON state on disk. The API is a
+minimal pair of `load()` and `save()` methods which read from and write
+to a configured file path.
+
 ```python
+from pathlib import Path
+import json
+
 class Memory:
+    def __init__(self, path: Path):
+        self.path = Path(path)
+
     def load(self):
+        """Return stored data or an empty dict if no file exists."""
         pass
+
     def save(self, data):
+        """Write data to disk creating directories as needed."""
         pass
 ```
 
