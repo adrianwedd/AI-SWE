@@ -72,6 +72,15 @@ To introduce a new agent to the system, the following process must be followed:
 
 ### Commit Messages
 
+# Repository Guidelines for Codex Agent
+
+These instructions apply to all files in this repository.
+
+## Workflow
+- Follow the Iterative Development Protocol described in `README.md`.
+- Keep `tasks.yml` up to date, marking tasks as `done` once implemented.
+
+## Commit Messages
 - Use descriptive commit messages.
 - For planning updates use `docs(planning): ...`.
 - For features use `feat(component): ...`.
@@ -79,6 +88,7 @@ To introduce a new agent to the system, the following process must be followed:
 
 ### Testing
 
+## Testing
 - Run `pytest --maxfail=1 --disable-warnings -q` before every commit.
 - Ensure a clean working tree (`git status`) before committing.
 
