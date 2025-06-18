@@ -18,7 +18,8 @@ def test_reflector_creates_task(tmp_path):
         "  status: pending\n"
     )
     code_file = tmp_path / "complex.py"
-    code_file.write_text("""\
+    code_file.write_text(
+        """\
 def func(x):
     if x > 0:
         if x > 1:
@@ -27,7 +28,8 @@ def func(x):
             return 2
     else:
         return 3
-""")
+"""
+    )
     refl = Reflector(tasks_path=tasks_file, threshold=1, paths=[code_file])
     new_tasks = refl.run_cycle()
     assert new_tasks

@@ -48,7 +48,7 @@ def test_schema_error(tmp_path):
 def test_load_schema_and_tasks(tmp_path):
     content = (
         "# jsonschema:\n"
-        "# {\"type\": \"array\"}\n"
+        '# {"type": "array"}\n'
         "- id: 1\n"
         "  description: test\n"
         "  component: core\n"

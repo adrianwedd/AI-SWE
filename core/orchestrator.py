@@ -1,3 +1,6 @@
+"""High-level coordinator for planner, executor and auditor."""
+
+
 class Orchestrator:
     """Coordinate planner, executor, auditor and persistence."""
 

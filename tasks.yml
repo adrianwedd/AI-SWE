@@ -154,3 +154,39 @@
   dependencies: []
   priority: 3
   status: done
+- id: 24
+  description: Add missing module docstrings across core modules
+  component: docs
+  dependencies: []
+  priority: 2
+  status: done
+- id: 25
+  description: Set up GitHub Actions workflow to run pytest and pylint
+  component: ci
+  dependencies: []
+  priority: 2
+  status: done
+- id: 26
+  description: Configure flake8 and pre-commit for code style enforcement
+  component: deps
+  dependencies: []
+  priority: 3
+  status: done
+- id: 27
+  description: Add flake8 configuration and fix style errors
+  component: code
+  dependencies: [26]
+  priority: 2
+  status: done
+- id: 28
+  description: Add pre-commit configuration running flake8 and pylint
+  component: ci
+  dependencies: [27]
+  priority: 2
+  status: done
+- id: 29
+  description: Document flake8 and pre-commit usage in README
+  component: docs
+  dependencies: [28]
+  priority: 3
+  status: done

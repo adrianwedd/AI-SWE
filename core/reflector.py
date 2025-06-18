@@ -1,3 +1,5 @@
+"""Provide reflection utilities for self-improvement loops."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -49,19 +51,21 @@ class Reflector:
         next_id = self._next_id(tasks)
         for path, score in metrics.items():
             if score > self.threshold:
-                new_tasks.append({
-                    "id": next_id,
-                    "description": f"Refactor {path} complexity {score}",
-                    "component": "core",
-                    "dependencies": [],
-                    "priority": 3,
-                    "status": "pending",
-                })
+                new_tasks.append(
+                    {
+                        "id": next_id,
+                        "description": f"Refactor {path} complexity {score}",
+                        "component": "core",
+                        "dependencies": [],
+                        "priority": 3,
+                        "status": "pending",
+                    }
+                )
                 next_id += 1
         return new_tasks
 
     def run_cycle(self):
-        files = self.paths or list(Path('.').rglob('*.py'))
+        files = self.paths or list(Path(".").rglob("*.py"))
         metrics = self._analyze(files)
         tasks = self._load_tasks()
         new_tasks = self._decide(metrics, tasks)

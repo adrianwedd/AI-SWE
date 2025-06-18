@@ -223,7 +223,13 @@ Your mission is to parse this document, form your plan, and then execute the ins
     ```
     * All tests must pass.
 
-3.  **Commit Genesis State**
+3.  **Set up Pre-commit Hooks**
+    ```bash
+    pre-commit install
+    ```
+    * Hooks run `black`, `flake8`, and `pylint` automatically.
+
+4.  **Commit Genesis State**
     ```bash
     cat <<EOF > .gitignore
     __pycache__/
