@@ -75,7 +75,7 @@
   component: auditor
   dependencies: [9]
   priority: 2
-  status: pending
+  status: done
 - id: 13
   description: Implement analyze() in SelfAuditor using radon APIs
   component: auditor
@@ -105,4 +105,18 @@
   component: orchestrator
   dependencies: [9]
   priority: 2
+  status: pending
+
+# Reflective loop enhancements
+- id: 16
+  description: Introduce Reflector component to automate self-improvement cycles
+  component: reflector
+  dependencies: []
+  priority: 2
+  status: pending
+- id: 17
+  description: Add unit test for Reflector run_cycle
+  component: testing
+  dependencies: [16]
+  priority: 3
   status: pending
