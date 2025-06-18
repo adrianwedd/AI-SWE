@@ -6,106 +6,80 @@ from .task import Task
 
 
 class Orchestrator:
-    """
-    Coordinates the self-improving loop of task planning, execution, and reflection.
-    """
+    """Coordinate the self-improving loop of planning and execution."""
 
     def __init__(self, planner, executor, reflector, memory, auditor):
-        """
-        Initializes the Orchestrator with necessary components.
+        """Store dependencies for later use."""
 
-        Args:
-            planner: An instance of the Planner class.
-            executor: An instance of the Executor class.
-            reflector: An instance of the Reflector class.
-            memory: An instance of the Memory class for loading/saving tasks.
-            auditor: An instance of the SelfAuditor class.
-        """
         self.planner = planner
         self.executor = executor
         self.reflector = reflector
         self.memory = memory
         self.auditor = auditor
 
-    def run(self, tasks_file: str = 'tasks.yml') -> None:
-        """
-        Runs the main orchestration loop.
+    # ------------------------------------------------------------------
+    def _task_to_dict(self, task: Task) -> dict:
+        return {f: getattr(task, f) for f in Task.__dataclass_fields__ if hasattr(task, f)}
 
-        The loop consists of:
-        1. Loading tasks.
-        2. Running a reflection cycle to potentially add/modify tasks.
-        3. Iteratively planning, executing, and updating task statuses.
+    # ------------------------------------------------------------------
+    def _load_tasks(self, tasks_file: str) -> List[Task]:
+        tasks = self.memory.load_tasks(tasks_file)
+        return tasks or []
 
-        Args:
-            tasks_file (str): The name of the file from which to load and
-                              to which to save tasks. Defaults to 'tasks.yml'.
-        """
-        # Load initial tasks
-        # Load persisted tasks as ``Task`` objects
-        tasks: List[Task] = self.memory.load_tasks(tasks_file)
-        if tasks is None:
-            tasks = [] # Start with an empty list if loading fails or file doesn't exist
+    # ------------------------------------------------------------------
+    def _reflect(self, tasks: List[Task], tasks_file: str) -> List[Task]:
+        reflected = self.reflector.run_cycle([self._task_to_dict(t) for t in tasks])
+        if reflected is None:
+            return tasks
+        if reflected and isinstance(reflected[0], Task):
+            tasks = reflected
+        else:
+            fields = set(Task.__dataclass_fields__.keys())
+            tasks = [Task(**{k: v for k, v in item.items() if k in fields}) for item in reflected]
+        self.memory.save_tasks(tasks, tasks_file)
+        return tasks
 
-        # Run reflection cycle
-        # Assuming reflector.run_cycle takes tasks, potentially modifies them or adds new ones,
-        # and returns the updated list of tasks.
-        def _to_dict(t: Task) -> dict:
-            return {f: getattr(t, f) for f in Task.__dataclass_fields__ if hasattr(t, f)}
+    # ------------------------------------------------------------------
+    def _execute_task(self, task: Task, tasks: List[Task], tasks_file: str) -> None:
+        if hasattr(task, "status"):
+            task.status = "in_progress"
+            self.memory.save_tasks(tasks, tasks_file)
+        else:
+            print(f"Warning: Task '{getattr(task, 'id', 'N/A')}' has no 'status' attribute.")
 
-        reflected = self.reflector.run_cycle([_to_dict(t) for t in tasks])
-        if reflected is not None:
-            if reflected and isinstance(reflected[0], Task):
-                tasks = reflected
-            else:
-                fields = set(Task.__dataclass_fields__.keys())
-                tasks = [Task(**{k: v for k, v in item.items() if k in fields}) for item in reflected]
-        self.memory.save_tasks(tasks, tasks_file)  # Save after reflection
+        print(f"Orchestrator: Executing task '{getattr(task, 'id', 'N/A')}'.")
+        self.executor.execute(task)
+
+        if hasattr(task, "status"):
+            task.status = "done"
+            self.memory.save_tasks(tasks, tasks_file)
+        else:
+            print(
+                f"Warning: Task '{getattr(task, 'id', 'N/A')}' has no 'status' attribute to mark as done."
+            )
+
+        print(f"Orchestrator: Task '{getattr(task, 'id', 'N/A')}' completed.")
+
+        audit_results = self.auditor.audit([self._task_to_dict(t) for t in tasks])
+        if audit_results:
+            fields = set(Task.__dataclass_fields__.keys())
+            new_tasks = [Task(**{k: v for k, v in item.items() if k in fields}) for item in audit_results]
+            tasks.extend(new_tasks)
+            self.memory.save_tasks(tasks, tasks_file)
+
+    def run(self, tasks_file: str = "tasks.yml") -> None:
+        """Run the orchestration loop."""
+
+        tasks: List[Task] = self._load_tasks(tasks_file)
+        tasks = self._reflect(tasks, tasks_file)
 
         while True:
             next_task = self.planner.plan(tasks)
-
             if next_task is None:
-                # No actionable tasks left (all done or blocked)
                 print("Orchestrator: No actionable tasks. Halting.")
                 break
 
             print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' selected for execution.")
-
-            # Mark task as "in_progress"
-            # Assuming task objects are mutable and have a 'status' attribute
-            if hasattr(next_task, 'status'):
-                next_task.status = "in_progress"
-                self.memory.save_tasks(tasks, tasks_file)
-            else:
-                print(
-                    f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute."
-                )
-
-            # Execute the task
-            print(f"Orchestrator: Executing task '{getattr(next_task, 'id', 'N/A')}'.")
-            self.executor.execute(next_task)
-
-            # Mark task as "done"
-            if hasattr(next_task, 'status'):
-                next_task.status = "done"
-                self.memory.save_tasks(tasks, tasks_file)
-            else:
-                # This case should ideally not happen if it had status for "in_progress"
-                print(
-                    f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute to mark as done."
-                )
-
-            print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' completed.")
-
-            # Run self-audit and append any generated refactor tasks
-            audit_results = self.auditor.audit([_to_dict(t) for t in tasks])
-            if audit_results:
-                fields = set(Task.__dataclass_fields__.keys())
-                new_tasks = [
-                    Task(**{k: v for k, v in item.items() if k in fields})
-                    for item in audit_results
-                ]
-                tasks.extend(new_tasks)
-                self.memory.save_tasks(tasks, tasks_file)
+            self._execute_task(next_task, tasks, tasks_file)
 
         print("Orchestrator: Run finished.")
