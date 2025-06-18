@@ -1,7 +1,6 @@
 """High-level coordinator for planner, executor and auditor."""
 
 from typing import List
-from dataclasses import asdict
 from .task import Task
 
 
