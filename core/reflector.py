@@ -62,12 +62,14 @@ class Reflector:
                 next_id += 1
         return new_tasks
 
-    def run_cycle(self):
+    def run_cycle(self, tasks=None):
+        """Analyze files and append tasks when complexity exceeds threshold."""
         files = self.paths or list(Path('.').rglob('*.py'))
         metrics = self._analyze(files)
-        tasks = self._load_tasks()
+        if tasks is None:
+            tasks = self._load_tasks()
         new_tasks = self._decide(metrics, tasks)
         if new_tasks:
             tasks.extend(new_tasks)
             self._save_tasks(tasks)
-        return new_tasks
+        return tasks

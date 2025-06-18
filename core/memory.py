@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import json
+import yaml
 
 
 class Memory:
@@ -29,3 +30,18 @@ class Memory:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("w") as fh:
             json.dump(data, fh)
+
+    # New helper methods for YAML task files
+    def load_tasks(self, tasks_file: str):
+        """Return tasks from a YAML file or an empty list."""
+        path = Path(tasks_file)
+        if not path.exists():
+            return []
+        with path.open("r") as fh:
+            return yaml.safe_load(fh) or []
+
+    def save_tasks(self, tasks, tasks_file: str):
+        """Write tasks to ``tasks_file`` in YAML format."""
+        path = Path(tasks_file)
+        with path.open("w") as fh:
+            yaml.safe_dump(tasks, fh, sort_keys=False)
