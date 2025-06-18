@@ -57,7 +57,7 @@
   component: auditor
   dependencies: []
   priority: 2
-  status: done
+  status: in_progress
 - id: 12
   description: Add radon dependency to requirements
   component: auditor
@@ -71,7 +71,7 @@
   dependencies:
   - 12
   priority: 2
-  status: done
+  status: pending
 - id: 14
   description: Implement audit() generating refactor tasks when thresholds exceeded
   component: auditor
@@ -85,7 +85,7 @@
   dependencies:
   - 14
   priority: 3
-  status: done
+  status: pending
 - id: 10
   description: Integrate wily history tracking into SelfAuditor
   component: auditor
@@ -106,7 +106,7 @@
   dependencies:
   - 5
   priority: 2
-  status: done
+  status: pending
 - id: 17
   description: Add Reflector class skeleton with reflect, analyze, decide, execute
     and validate methods
@@ -114,7 +114,7 @@
   dependencies:
   - 16
   priority: 2
-  status: done
+  status: pending
 - id: 18
   description: Implement decision logic in Reflector to update tasks.yml based on
     analysis
@@ -122,14 +122,14 @@
   dependencies:
   - 17
   priority: 3
-  status: done
+  status: pending
 - id: 19
   description: Integrate Reflector into Orchestrator run loop
   component: orchestrator
   dependencies:
   - 17
   priority: 3
-  status: done
+  status: pending
 - id: 20
   description: Add unit tests for Reflector and its orchestration integration
   component: testing
@@ -284,19 +284,19 @@
   priority: 2
   status: done
 - id: 44
-  description: Refactor core/reflector.py complexity 24
+  description: Refactor tests/test_bootstrap.py complexity 12
   component: core
   dependencies: []
   priority: 3
   status: pending
 - id: 45
-  description: Refactor core/planner.py complexity 41
+  description: Refactor tests/test_planner.py complexity 24
   component: core
   dependencies: []
   priority: 3
   status: pending
 - id: 46
-  description: Refactor core/orchestrator.py complexity 13
+  description: Refactor tests/test_executor.py complexity 13
   component: core
   dependencies: []
   priority: 3
@@ -308,19 +308,19 @@
   priority: 3
   status: pending
 - id: 48
-  description: Refactor tests/test_planner.py complexity 24
+  description: Refactor core/planner.py complexity 41
   component: core
   dependencies: []
   priority: 3
   status: pending
 - id: 49
-  description: Refactor tests/test_bootstrap.py complexity 12
+  description: Refactor core/orchestrator.py complexity 13
   component: core
   dependencies: []
   priority: 3
   status: pending
 - id: 50
-  description: Refactor tests/test_executor.py complexity 13
+  description: Refactor core/reflector.py complexity 24
   component: core
   dependencies: []
   priority: 3
