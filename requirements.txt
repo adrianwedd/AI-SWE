@@ -4,3 +4,6 @@ jsonschema==4.21.0
 radon==5.1.0
 wily==1.25.0
 pylint==3.3.7
+fastapi==0.111.0
+uvicorn==0.29.0
+requests==2.31.0
