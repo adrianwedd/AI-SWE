@@ -10,7 +10,7 @@ Your mission is to parse this document, form your plan, and then execute the ins
 
 ## Phase 1: Inception & Environment Setup
 
-1.  **Acknowledge Directives** - Parse this `README.md` to form your initial plan. **Do not** modify or delete this file.
+1.  **Acknowledge Directives** - Parse this `README.md` to form your initial plan.
 
 2.  **Initialize Version Control**
     ```bash
@@ -166,3 +166,48 @@ Your mission is to parse this document, form your plan, and then execute the ins
 * `git status` reports a clean working tree.
 
 End of directives. Proceed.
+
+---
+
+## Iterative Development Protocol (IDP)
+
+You have completed bootstrapping. Your mission now is to grow this codebase by
+working through the tasks in `tasks.yml` using an iterative cycle.
+
+### The Iteration Cycle: Plan, Document, Build, Test, Commit
+
+#### Step 1: Orient & Plan (Thinking Phase)
+1. **Ingest Current State**: Review `ARCHITECTURE.md` and `tasks.yml`.
+2. **Select a Focus**: Choose the highest-priority `pending` task as the current Epic.
+3. **Analyze the Epic**: Determine the component it belongs to, define acceptance
+   criteria, and outline required methods or files.
+
+#### Step 2: Document & Refine (Architecting Phase)
+1. **Update Blueprint First**: Document new methods or logic in `ARCHITECTURE.md`.
+2. **Decompose the Epic**: Break it into small sub-tasks in `tasks.yml`, set the
+   Epic to `in_progress`, and capture dependencies.
+3. **Commit the Plan**: Stage changes and commit with
+   `docs(planning): decompose epic #[Epic_ID] and refine architecture`.
+
+#### Step 3: Build & Test (Implementation Phase)
+1. **Execute Sub-Tasks Sequentially**: Take the next `pending` sub-task.
+2. **Write the Test**: Add a failing test in `tests/` describing the desired behavior.
+3. **Write the Code**: Implement the minimal code in `core/` to pass the test.
+4. **Verify**: Run `pytest` to ensure all tests pass.
+5. **Commit the Work**: Use commit message
+   `feat(component): implement [description] for sub-task #[Sub-Task_ID]`.
+6. **Repeat** until all sub-tasks for the Epic are complete.
+
+#### Step 4: Review & Conclude (Completion Phase)
+1. **Final Review**: Ensure the feature meets architectural goals.
+2. **Update Task Status**: Mark the Epic and its sub-tasks `done` in `tasks.yml`.
+3. **Commit the Completion**: Use commit message
+   `chore(tasks): complete epic #[Epic_ID]`.
+4. **Loop**: Return to Step 1 and pick the next Epic.
+
+### Definition of Done
+1. Code implemented.
+2. Architecture updated.
+3. Tests pass with coverage for new features.
+4. Tasks marked complete in `tasks.yml`.
+
