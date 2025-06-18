@@ -165,7 +165,7 @@
   component: ci
   dependencies: []
   priority: 2
-  status: pending
+  status: done
 - id: 26
   description: Configure flake8 and pre-commit for code style enforcement
   component: deps
