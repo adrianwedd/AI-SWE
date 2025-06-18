@@ -62,9 +62,9 @@ def main(argv=None):
 ```
 
 ### Memory
-Simple persistence helper for storing JSON state on disk. The API is a
-minimal pair of `load()` and `save()` methods which read from and write
-to a configured file path.
+Simple persistence helper for storing JSON state on disk. The API exposes
+`load()`/`save()` for generic JSON data and `load_tasks()`/`save_tasks()`
+for YAML task lists. All methods create parent directories as needed.
 
 ```python
 from pathlib import Path
@@ -80,6 +80,14 @@ class Memory:
 
     def save(self, data):
         """Write data to disk creating directories as needed."""
+        pass
+
+    def load_tasks(self, tasks_file: str):
+        """Return tasks from ``tasks_file`` or an empty list."""
+        pass
+
+    def save_tasks(self, tasks, tasks_file: str):
+        """Write ``tasks`` back to ``tasks_file``."""
         pass
 ```
 

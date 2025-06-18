@@ -62,9 +62,11 @@ class Orchestrator:
             # Assuming task objects are mutable and have a 'status' attribute
             if hasattr(next_task, 'status'):
                 next_task.status = "in_progress"
+                self.memory.save_tasks(tasks, tasks_file)
             else:
-                print(f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute.")
-            self.memory.save_tasks(tasks, tasks_file)
+                print(
+                    f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute."
+                )
 
             # Execute the task
             print(f"Orchestrator: Executing task '{getattr(next_task, 'id', 'N/A')}'.")
@@ -73,10 +75,12 @@ class Orchestrator:
             # Mark task as "done"
             if hasattr(next_task, 'status'):
                 next_task.status = "done"
+                self.memory.save_tasks(tasks, tasks_file)
             else:
                 # This case should ideally not happen if it had status for "in_progress"
-                print(f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute to mark as done.")
-            self.memory.save_tasks(tasks, tasks_file)
+                print(
+                    f"Warning: Task '{getattr(next_task, 'id', 'N/A')}' has no 'status' attribute to mark as done."
+                )
 
             print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' completed.")
 
