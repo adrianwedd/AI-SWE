@@ -1,6 +1,7 @@
 import unittest
+from dataclasses import asdict
 from unittest.mock import Mock, MagicMock, call, patch
-from types import SimpleNamespace
+from core.task import Task
 
 # Need to import the actual classes to be instantiated or mocked if type hints are used by Orchestrator
 from core.planner import Planner
@@ -33,13 +34,13 @@ class TestOrchestrator(unittest.TestCase):
 
     def test_run_loop_full_cycle_one_task(self):
         tasks_file = "test_tasks.yml"
-        initial_tasks = [SimpleNamespace(id="t0", status="pending")] # Tasks loaded from memory
+        initial_tasks = [Task(id="t0", description="", component="test", dependencies=[], priority=1, status="pending")]  # Tasks loaded from memory
         reflected_tasks = [
-            SimpleNamespace(id="t0", status="pending"),
-            SimpleNamespace(id="t_new", status="pending", description="New task from reflector")
-        ] # Tasks after reflector ran
+            Task(id="t0", description="", component="test", dependencies=[], priority=1, status="pending"),
+            Task(id="t_new", description="New task from reflector", component="test", dependencies=[], priority=1, status="pending")
+        ]  # Tasks after reflector ran
 
-        task1_planned = SimpleNamespace(id="t1", status="pending", description="Task 1")
+        task1_planned = Task(id="t1", description="Task 1", component="test", dependencies=[], priority=1, status="pending")
 
         self.mock_memory.load_tasks.return_value = initial_tasks
         self.mock_reflector.run_cycle.return_value = reflected_tasks
@@ -54,8 +55,8 @@ class TestOrchestrator(unittest.TestCase):
         self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
 
         # Verify reflector call
-        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
-        self.mock_memory.save_tasks.assert_any_call(reflected_tasks, tasks_file) # First save after reflection
+        self.mock_reflector.run_cycle.assert_called_once_with([asdict(t) for t in initial_tasks])
+        self.mock_memory.save_tasks.assert_any_call(reflected_tasks, tasks_file)  # First save after reflection
 
         # Verify planner calls (called twice: once for task1, once for None)
         self.mock_planner.plan.assert_has_calls([call(reflected_tasks), call(reflected_tasks)])
@@ -149,7 +150,7 @@ class TestOrchestrator(unittest.TestCase):
         # Now the execute_side_effect assertion would have run.
         # And we can re-verify other calls.
         self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
-        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
+        self.mock_reflector.run_cycle.assert_called_once_with([asdict(t) for t in initial_tasks])
         self.mock_executor.execute.assert_called_once_with(task1_planned)
         self.assertEqual(task1_planned.status, "done") # Final status
         self.assertEqual(self.mock_memory.save_tasks.call_count, 3)
@@ -172,7 +173,7 @@ class TestOrchestrator(unittest.TestCase):
 
     def test_run_loop_terminates_when_planner_returns_none(self):
         tasks_file = "tasks.yml"
-        initial_tasks = [SimpleNamespace(id="t1", status="pending")]
+        initial_tasks = [Task(id="t1", description="", component="test", dependencies=[], priority=1, status="pending")]
         self.mock_memory.load_tasks.return_value = initial_tasks
         self.mock_reflector.run_cycle.return_value = initial_tasks # Reflector adds no new tasks
         self.mock_planner.plan.return_value = None # Planner immediately says nothing to do
@@ -181,7 +182,7 @@ class TestOrchestrator(unittest.TestCase):
             self.orchestrator.run(tasks_file)
 
         self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
-        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
+        self.mock_reflector.run_cycle.assert_called_once_with([asdict(t) for t in initial_tasks])
         self.mock_memory.save_tasks.assert_called_once_with(initial_tasks, tasks_file) # After reflection
         self.mock_planner.plan.assert_called_once_with(initial_tasks)
         self.mock_executor.execute.assert_not_called()
@@ -204,7 +205,7 @@ class TestOrchestrator(unittest.TestCase):
     def test_run_task_missing_status_attribute(self):
         # Test robustness if a task somehow doesn't have 'status'
         tasks_file = "tasks_no_status.yml"
-        task_no_status = SimpleNamespace(id="t_no_stat", description="Test")
+        task_no_status = Task(id="t_no_stat", description="Test", component="test", dependencies=[], priority=1, status="pending")
         if hasattr(task_no_status, 'status'): # Ensure it's not there
             delattr(task_no_status, 'status')
 
