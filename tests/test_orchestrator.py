@@ -1,16 +1,237 @@
-import sys
-from pathlib import Path
+import unittest
+from unittest.mock import Mock, MagicMock, call, patch
+from types import SimpleNamespace
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+# Need to import the actual classes to be instantiated or mocked if type hints are used by Orchestrator
+from core.planner import Planner
+from core.executor import Executor
+from core.reflector import Reflector
+from core.memory import Memory
+from core.orchestrator import Orchestrator
 
-from core.orchestrator import Orchestrator  # noqa: E402
-from core.memory import Memory  # noqa: E402
+
+class TestOrchestrator(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_planner = MagicMock(spec=Planner)
+        self.mock_executor = MagicMock(spec=Executor)
+        self.mock_reflector = MagicMock(spec=Reflector)
+        self.mock_memory = MagicMock(spec=Memory)
+
+        self.orchestrator = Orchestrator(
+            planner=self.mock_planner,
+            executor=self.mock_executor,
+            reflector=self.mock_reflector,
+            memory=self.mock_memory
+        )
+
+    def test_init_stores_dependencies(self):
+        self.assertIs(self.orchestrator.planner, self.mock_planner)
+        self.assertIs(self.orchestrator.executor, self.mock_executor)
+        self.assertIs(self.orchestrator.reflector, self.mock_reflector)
+        self.assertIs(self.orchestrator.memory, self.mock_memory)
+
+    def test_run_loop_full_cycle_one_task(self):
+        tasks_file = "test_tasks.yml"
+        initial_tasks = [SimpleNamespace(id="t0", status="pending")] # Tasks loaded from memory
+        reflected_tasks = [
+            SimpleNamespace(id="t0", status="pending"),
+            SimpleNamespace(id="t_new", status="pending", description="New task from reflector")
+        ] # Tasks after reflector ran
+
+        task1_planned = SimpleNamespace(id="t1", status="pending", description="Task 1")
+
+        self.mock_memory.load_tasks.return_value = initial_tasks
+        self.mock_reflector.run_cycle.return_value = reflected_tasks
+
+        # Planner will return task1 first, then None to terminate
+        self.mock_planner.plan.side_effect = [task1_planned, None]
+
+        with patch('builtins.print') as mock_print: # Suppress print output during test
+            self.orchestrator.run(tasks_file)
+
+        # Verify initial load
+        self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
+
+        # Verify reflector call
+        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
+        self.mock_memory.save_tasks.assert_any_call(reflected_tasks, tasks_file) # First save after reflection
+
+        # Verify planner calls (called twice: once for task1, once for None)
+        self.mock_planner.plan.assert_has_calls([call(reflected_tasks), call(reflected_tasks)])
+
+        # Verify task1 status updates and save calls
+        # 1. After reflection
+        # 2. Status to "in_progress"
+        # 3. Status to "done"
+        self.assertEqual(self.mock_memory.save_tasks.call_count, 3)
+
+        # Check specific calls for task1_planned
+        # Note: reflected_tasks list is modified in place by the orchestrator for status.
+        # So task1_planned which is part of that list (or conceptually represents an item in it)
+        # will have its status changed.
+
+        # Call after reflection (already asserted by assert_any_call)
+        # self.mock_memory.save_tasks.assert_any_call(reflected_tasks, tasks_file)
+
+        # After marking "in_progress"
+        self.assertEqual(task1_planned.status, "done") # Status should be 'done' by the end of its processing
+                                                       # The test checks final state.
+                                                       # To check intermediate, would need more complex mocking or state capture.
+
+        # Check that save_tasks was called with the tasks list when task1 was in_progress
+        # This requires inspecting the actual arguments to save_tasks.
+        # The third argument to assert_any_call is the index of the call if there are multiple.
+        # We expect save_tasks to be called with task1 status as "in_progress"
+        # And then again with task1 status as "done"
+
+        # Create expected task states for save calls
+        # State after reflection (this is reflected_tasks)
+        # State with task1_planned as "in_progress"
+        tasks_after_reflection = reflected_tasks # This is the list instance used
+
+        # The orchestrator modifies the task object directly.
+        # So when save_tasks is called, task1_planned.status would have been updated.
+
+        # Executor call
+        self.mock_executor.execute.assert_called_once_with(task1_planned)
+
+        # Final status of task1 should be "done"
+        self.assertEqual(task1_planned.status, "done")
+
+        # Check the sequence of save_tasks more carefully for status changes
+        # Call 1: After reflector.run_cycle
+        #   reflected_tasks might have new tasks. Task1 is not yet processed.
+        # Call 2: Task1 status -> "in_progress"
+        # Call 3: Task1 status -> "done"
+
+        args_list = self.mock_memory.save_tasks.call_args_list
+        self.assertEqual(len(args_list), 3)
+
+        # Call 1: after reflection
+        self.assertEqual(args_list[0], call(reflected_tasks, tasks_file))
+
+        # For calls 2 and 3, the 'tasks' list (which is 'reflected_tasks') is modified in place.
+        # So, task1_planned (which is an item from that list conceptually) will have its status changed.
+        # When testing save_tasks for "in_progress", we'd expect the *object* task1_planned
+        # to have status "in_progress" *at the time of that specific call*.
+        # This is hard to assert directly with simple mock call_args_list if the object is mutated.
+        # However, we know execute is called between "in_progress" and "done" saves.
+
+        # A practical way to check:
+        # - save_tasks was called 3 times (already did)
+        # - execute was called once with task1_planned (already did)
+        # - The task object passed to execute should have status "in_progress" at that point.
+        #   This requires execute to be called *before* status changes to "done".
+        #   The orchestrator logic is: status="in_progress" -> save -> execute -> status="done" -> save.
+
+        # To verify the status at the time of execute:
+        # We can change the mock_executor.execute to a side_effect function that asserts status
+        def execute_side_effect(task_arg):
+            self.assertEqual(task_arg.status, "in_progress", "Task status should be 'in_progress' when execute is called")
+        self.mock_executor.execute.side_effect = execute_side_effect
+
+        # Rerun with the side effect (need to reset mocks that track calls)
+        self.mock_memory.reset_mock()
+        self.mock_reflector.reset_mock()
+        self.mock_planner.reset_mock()
+        self.mock_executor.reset_mock() # Resetting this mock means we need to re-assign side_effect
+
+        self.mock_executor.execute.side_effect = execute_side_effect # Re-assign after reset
+        self.mock_memory.load_tasks.return_value = initial_tasks
+        self.mock_reflector.run_cycle.return_value = reflected_tasks
+        task1_planned.status = "pending" # Reset status before rerun
+        self.mock_planner.plan.side_effect = [task1_planned, None]
+
+        with patch('builtins.print') as mock_print:
+             self.orchestrator.run(tasks_file)
+
+        # Now the execute_side_effect assertion would have run.
+        # And we can re-verify other calls.
+        self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
+        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
+        self.mock_executor.execute.assert_called_once_with(task1_planned)
+        self.assertEqual(task1_planned.status, "done") # Final status
+        self.assertEqual(self.mock_memory.save_tasks.call_count, 3)
 
 
-def test_orchestrator_run(capsys, tmp_path):
-    mem = Memory(tmp_path / "state.json")
-    orch = Orchestrator(None, None, None, mem)
-    result = orch.run()
-    captured = capsys.readouterr()
-    assert result is True
-    assert "Orchestrator running" in captured.out
+    def test_run_loop_no_tasks_from_memory_and_no_new_tasks_from_reflector(self):
+        tasks_file = "empty_tasks.yml"
+        self.mock_memory.load_tasks.return_value = []  # No tasks loaded
+        self.mock_reflector.run_cycle.return_value = [] # No new tasks from reflector
+        self.mock_planner.plan.return_value = None # Planner finds nothing to do
+
+        with patch('builtins.print') as mock_print:
+            self.orchestrator.run(tasks_file)
+
+        self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
+        self.mock_reflector.run_cycle.assert_called_once_with([])
+        self.mock_memory.save_tasks.assert_called_once_with([], tasks_file) # Saved empty list after reflection
+        self.mock_planner.plan.assert_called_once_with([]) # Called with empty list
+        self.mock_executor.execute.assert_not_called() # No task execution
+
+    def test_run_loop_terminates_when_planner_returns_none(self):
+        tasks_file = "tasks.yml"
+        initial_tasks = [SimpleNamespace(id="t1", status="pending")]
+        self.mock_memory.load_tasks.return_value = initial_tasks
+        self.mock_reflector.run_cycle.return_value = initial_tasks # Reflector adds no new tasks
+        self.mock_planner.plan.return_value = None # Planner immediately says nothing to do
+
+        with patch('builtins.print') as mock_print:
+            self.orchestrator.run(tasks_file)
+
+        self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
+        self.mock_reflector.run_cycle.assert_called_once_with(initial_tasks)
+        self.mock_memory.save_tasks.assert_called_once_with(initial_tasks, tasks_file) # After reflection
+        self.mock_planner.plan.assert_called_once_with(initial_tasks)
+        self.mock_executor.execute.assert_not_called()
+
+    def test_run_handles_load_tasks_returning_none(self):
+        tasks_file = "non_existent_tasks.yml"
+        self.mock_memory.load_tasks.return_value = None # Simulate file not found / load error
+        self.mock_reflector.run_cycle.return_value = [] # Reflector works with empty list
+        self.mock_planner.plan.return_value = None
+
+        with patch('builtins.print') as mock_print:
+            self.orchestrator.run(tasks_file)
+
+        self.mock_memory.load_tasks.assert_called_once_with(tasks_file)
+        self.mock_reflector.run_cycle.assert_called_once_with([]) # Called with empty list
+        self.mock_memory.save_tasks.assert_called_once_with([], tasks_file)
+        self.mock_planner.plan.assert_called_once_with([])
+        self.mock_executor.execute.assert_not_called()
+
+    def test_run_task_missing_status_attribute(self):
+        # Test robustness if a task somehow doesn't have 'status'
+        tasks_file = "tasks_no_status.yml"
+        task_no_status = SimpleNamespace(id="t_no_stat", description="Test")
+        if hasattr(task_no_status, 'status'): # Ensure it's not there
+            delattr(task_no_status, 'status')
+
+        initial_tasks = [task_no_status]
+
+        self.mock_memory.load_tasks.return_value = initial_tasks
+        self.mock_reflector.run_cycle.return_value = initial_tasks
+        self.mock_planner.plan.side_effect = [task_no_status, None] # Planner returns this malformed task
+
+        with patch('builtins.print') as mock_print:
+            self.orchestrator.run(tasks_file)
+
+        # Orchestrator should attempt to run it, print warnings, but not crash.
+        self.mock_executor.execute.assert_called_once_with(task_no_status)
+        # Check for warning prints (optional, but good for robustness check)
+        # Example: mock_print.assert_any_call(Your warning message for missing status)
+
+        # The number of save_tasks calls might be different if status updates fail silently
+        # or are skipped. Original logic has 3 saves for one task.
+        # 1. After reflection
+        # 2/3. Skipped if hasattr(next_task, 'status') is false.
+        # Let's check the implementation of orchestrator: it uses hasattr.
+        # So, if no 'status', it prints a warning and doesn't try to set it.
+        # Thus, only one save (after reflection) should occur.
+        self.assertEqual(self.mock_memory.save_tasks.call_count, 1)
+        self.mock_memory.save_tasks.assert_called_once_with(initial_tasks, tasks_file)
+
+
+if __name__ == '__main__':
+    unittest.main()

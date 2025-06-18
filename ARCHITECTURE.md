@@ -3,23 +3,44 @@
 ## Components
 
 ### Orchestrator
-Coordinates the main control loop. It loads persistent state from
-`Memory`, asks the `Planner` for the next action, executes it via the
-`Executor` and finally allows the `SelfAuditor` to inspect results. The
-class simply wires these components together and exposes a `run()`
-method that will later contain the orchestration logic.
+Coordinates the main control loop for the self-improving system. It initializes with components like `Planner`, `Executor`, `Reflector`, and `Memory`. The `run` method orchestrates the primary workflow: loading tasks from persistence (e.g., `tasks.yml`) using `Memory`, invoking the `Reflector` to analyze the codebase and potentially generate new tasks (which are then saved back via `Memory`), and then entering a loop. In this loop, it uses the `Planner` to decide the next task, marks the task as "in_progress" (saving state), executes it using the `Executor`, and finally marks it as "done" (again, saving state). The loop continues until the `Planner` determines no more actionable tasks are available.
 
 ```python
 class Orchestrator:
-    def __init__(self, planner, executor, auditor, memory):
+    """
+    Coordinates the self-improving loop of task planning, execution, and reflection.
+    """
+    def __init__(self, planner, executor, reflector, memory):
+        """
+        Initializes the Orchestrator with necessary components.
+
+        Args:
+            planner: An instance of the Planner class.
+            executor: An instance of the Executor class.
+            reflector: An instance of the Reflector class.
+            memory: An instance of the Memory class for loading/saving tasks.
+        """
         self.planner = planner
         self.executor = executor
-        self.auditor = auditor
+        self.reflector = reflector
         self.memory = memory
 
-    def run(self):
-        """Entry point for the orchestration loop."""
-        pass
+    def run(self, tasks_file: str = 'tasks.yml'):
+        """
+        Runs the main orchestration loop.
+
+        The loop consists of:
+        1. Loading tasks.
+        2. Running a reflection cycle to potentially add/modify tasks.
+        3. Iteratively planning, executing, and updating task statuses.
+
+        Args:
+            tasks_file (str): The name of the file from which to load and
+                              to which to save tasks. Defaults to 'tasks.yml'.
+        """
+        # tasks = self.memory.load_tasks(tasks_file)
+        # ... Full method implementation as in core/orchestrator.py
+        pass # Placeholder for brevity in markdown
 ```
 
 ### CLI
@@ -63,17 +84,64 @@ class Memory:
 ```
 
 ### Planner
+The `Planner` is responsible for deciding which task should be executed next. Its `plan` method takes a list of all current tasks. It filters these tasks to find those that are ready to be executed: specifically, tasks that have a status of "todo" and whose declared dependencies (other tasks) have a status of "done". Among these eligible tasks, it selects the one with the highest `priority` value. If no tasks are ready, it returns `None`.
+
 ```python
 class Planner:
-    def plan(self, tasks):
-        pass
+    """
+    A class that plans the execution order of tasks.
+    It prioritizes tasks based on their priority and dependencies.
+    """
+    def plan(self, tasks: list) -> object | None:
+        """
+        Determines the next task to execute based on priority and dependencies.
+
+        Tasks with higher priority are selected first.
+        Tasks with dependencies are only selected if all their dependent tasks
+        have a status of "done".
+
+        Args:
+            tasks: A list of task objects. Each task object is expected to have
+                   at least the following attributes:
+                   - id (any): A unique identifier for the task.
+                   - priority (int): The priority of the task (higher value means higher priority).
+                   - dependencies (list): A list of task IDs that this task depends on.
+                   - status (str): The current status of the task (e.g., "todo", "done").
+
+        Returns:
+            The next task object to execute, or None if no tasks can be
+            executed (e.g., all tasks are done, or pending tasks have unmet
+            dependencies).
+        """
+        # todo_tasks = [task for task in tasks if hasattr(task, 'status') and task.status == "todo"]
+        # ... Full method implementation as in core/planner.py
+        pass # Placeholder for brevity in markdown
 ```
 
 ### Executor
+The `Executor` is responsible for carrying out a given task. Currently, its `execute` method is a basic implementation. It takes a task object and prints its `description` attribute to standard output. If the task lacks a `description` but has an `id`, it prints the ID with a notification. If neither is present, it prints a generic message.
+
 ```python
 class Executor:
-    def execute(self, task):
-        pass
+    """
+    A class responsible for executing tasks.
+    """
+    def execute(self, task: object) -> None:
+        """
+        Executes a given task.
+
+        For now, this method simply prints the task's description
+        to standard output. It assumes the task object has a 'description'
+        attribute.
+
+        Args:
+            task: The task object to execute. Expected to have a
+                  'description' attribute (e.g., task.description).
+        """
+        # if hasattr(task, 'description'):
+        #     print(f"Executing task: {task.description}")
+        # ... Full method implementation as in core/executor.py
+        pass # Placeholder for brevity in markdown
 ```
 
 ### SelfAuditor
@@ -126,6 +194,36 @@ class Reflector:
             tasks.extend(new)
             self._save_tasks(tasks)
         return new
+```
+
+## Main Orchestration Loop
+This diagram illustrates the primary control flow managed by the `Orchestrator`'s `run` method.
+
+```mermaid
+flowchart TD
+    subgraph Orchestrator Run Cycle
+        direction LR
+        StartRun[Start run()] --> LoadTasks(Load tasks from Memory)
+        LoadTasks --> RunReflector(Call Reflector.run_cycle())
+        RunReflector --> SaveReflectedTasks(Save updated tasks to Memory)
+        SaveReflectedTasks --> LoopDecision{Actionable task?}
+
+        subgraph Task Execution Loop
+            direction LR
+            LoopDecision -- Yes --> PlanNext(Planner.plan())
+            PlanNext --> TaskSelected{Task available?}
+            TaskSelected -- Yes --> MarkInProgress(Update task: in_progress)
+            MarkInProgress --> SaveInProgress(Save tasks to Memory)
+            SaveInProgress --> ExecuteTask(Executor.execute())
+            ExecuteTask --> MarkDone(Update task: done)
+            MarkDone --> SaveDone(Save tasks to Memory)
+            SaveDone --> LoopDecision
+        end
+
+        TaskSelected -- No --> EndLoop(End Loop)
+        LoopDecision -- No --> EndLoop
+        EndLoop --> FinishRun[Finish run()]
+    end
 ```
 
 ## Bootstrapping Flow
