@@ -466,7 +466,6 @@
   dependencies: []
   priority: 3
   status: pending
-
 - id: 74
   description: Document plugin governance requirements and dependency controls
   component: docs
@@ -474,14 +473,12 @@
   - 73
   priority: 3
   status: pending
-
 - id: 75
   description: Add SAST, SCA, secret scanning, and compliance checks in CI/CD
   component: ci
   dependencies: []
   priority: 2
   status: pending
-
 - id: 76
   description: Enforce cryptographic signing before plugin marketplace publication
   component: ci
@@ -489,7 +486,6 @@
   - 75
   priority: 2
   status: pending
-
 - id: 77
   description: Build example first-party plugins (e.g., tech debt analyzer)
   component: plugins
@@ -498,7 +494,6 @@
   - 75
   priority: 3
   status: pending
-
 - id: 78
   description: Validate plugin architecture and CI pipeline with first-party plugins
   component: plugins
@@ -506,14 +501,12 @@
   - 77
   priority: 3
   status: pending
-
 - id: 79
   description: Instrument all components with OpenTelemetry for metrics, logs, and traces
   component: observability
   dependencies: []
   priority: 3
   status: pending
-
 - id: 80
   description: Store metrics in Prometheus and define Grafana dashboards as code
   component: observability
@@ -521,7 +514,6 @@
   - 79
   priority: 3
   status: pending
-
 - id: 81
   description: Feed collected metrics to Reflector as its reward signal
   component: reflector
@@ -529,14 +521,12 @@
   - 79
   priority: 3
   status: pending
-
 - id: 82
   description: Introduce Rust modules via PyO3 for performance-critical code
   component: microservices
   dependencies: []
   priority: 3
   status: pending
-
 - id: 83
   description: Add Node.js services for I/O-bound tasks and coordinate via gRPC
   component: microservices
@@ -544,7 +534,6 @@
   - 82
   priority: 3
   status: pending
-
 - id: 84
   description: Apply API Gateway and Database-per-Service patterns
   component: microservices
@@ -553,7 +542,6 @@
   - 83
   priority: 3
   status: pending
-
 - id: 85
   description: Ensure all microservices integrate with standardized OTel and security tooling
   component: observability
@@ -563,14 +551,12 @@
   - 83
   priority: 3
   status: pending
-
 - id: 86
   description: Implement Vision Engine prioritization using WSJF heuristics
   component: vision
   dependencies: []
   priority: 3
   status: pending
-
 - id: 87
   description: Train RL-based Vision Engine in shadow mode and gradually delegate control
   component: vision
@@ -578,14 +564,12 @@
   - 86
   priority: 3
   status: pending
-
 - id: 88
   description: Build fast PPO-aligned Reflector inner loop for continuous improvement
   component: reflector
   dependencies: []
   priority: 2
   status: pending
-
 - id: 89
   description: Develop evolutionary outer loop for architectural search
   component: reflector
@@ -593,14 +577,12 @@
   - 88
   priority: 3
   status: pending
-
 - id: 90
   description: Contribute integration guides and sample code to frameworks like LangChain and CrewAI
   component: docs
   dependencies: []
   priority: 3
   status: pending
-
 - id: 91
   description: Foster developer community to encourage adoption of AI-SWA
   component: community
