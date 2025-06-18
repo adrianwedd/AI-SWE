@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 
 from core.bootstrap import load_schema_and_tasks  # noqa: E402
 from core.memory import TASK_SCHEMA
