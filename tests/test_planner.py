@@ -168,6 +168,14 @@ class TestPlanner(unittest.TestCase):
         selected = self.planner.plan(tasks)
         self.assertEqual(selected.id, "pending_dep_on_done")
 
+    def test_duplicate_task_ids_raise_error(self):
+        tasks = [
+            self._create_task("dup", 1, "pending"),
+            self._create_task("dup", 2, "pending"),
+        ]
+        with self.assertRaises(ValueError):
+            self.planner.plan(tasks)
+
 
 if __name__ == '__main__':
     unittest.main()

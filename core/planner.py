@@ -25,6 +25,14 @@ class Planner:
             executed (e.g., all tasks are done, or pending tasks have unmet
             dependencies).
         """
+        seen_ids = set()
+        for task in tasks:
+            task_id = getattr(task, 'id', None)
+            if task_id in seen_ids:
+                raise ValueError(f"Duplicate task id {task_id} detected")
+            if task_id is not None:
+                seen_ids.add(task_id)
+
         # Filter tasks that are "pending"
         pending_tasks = [task for task in tasks if hasattr(task, 'status') and task.status == "pending"]
 
