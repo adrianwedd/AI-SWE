@@ -77,10 +77,11 @@ class Executor:
 ```
 
 ### SelfAuditor
-Inspects code quality metrics and generates refactor tasks when complexity
-is high. Metrics are gathered using **radon** and optionally tracked over time
-with **wily**. The auditor does not change code directly; instead it returns a
-list of new tasks for the `Planner` to merge into `tasks.yml`.
+Inspects code quality metrics and generates refactor tasks when complexity is
+high. The initial implementation relies on **radon** to calculate cyclomatic
+complexity for Python modules. Historical tracking with **wily** will be added
+later. The auditor never mutates code directly; instead it returns a list of
+new tasks for the `Planner` to merge into `tasks.yml`.
 
 ```python
 class SelfAuditor:
@@ -88,10 +89,11 @@ class SelfAuditor:
         self.threshold = threshold
 
     def analyze(self, paths):
-        """Return radon metrics for the given module paths."""
+        """Return cyclomatic complexity metrics for ``paths`` using radon."""
 
     def audit(self, tasks):
-        """Inspect code and return new task dictionaries when limits are exceeded."""
+        """Inspect complexity and return new task dictionaries when limits
+        are exceeded."""
 ```
 
 ## Bootstrapping Flow
