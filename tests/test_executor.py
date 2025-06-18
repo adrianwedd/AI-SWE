@@ -1,5 +1,7 @@
+import os
 import unittest
-from unittest.mock import patch, call
+from pathlib import Path
+from unittest.mock import patch
 from types import SimpleNamespace
 from core.executor import Executor
 
@@ -58,6 +60,22 @@ class TestExecutor(unittest.TestCase):
         task = SimpleNamespace(id="t_other", description="Other attributes test", priority=10, status="pending")
         self.executor.execute(task)
         mock_print.assert_called_once_with("Executing task: Other attributes test")
+
+    def test_execute_task_with_command_creates_log(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cwd = os.getcwd()
+            os.chdir(tmpdir)
+            try:
+                task = SimpleNamespace(id="cmd", description="Run echo", command="echo hello")
+                self.executor.execute(task)
+            finally:
+                os.chdir(cwd)
+
+            logs = list(Path(tmpdir).joinpath("logs").glob("task-cmd-*.log"))
+            assert logs, "Log file not created"
+            assert logs[0].read_text().strip() == "hello"
 
 
 if __name__ == '__main__':

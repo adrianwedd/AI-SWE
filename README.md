@@ -55,12 +55,17 @@ Planner decides what to build next. The Executor writes files and configures CI/
    cd ai-swa
    pip install -r requirements.txt
    ```
-2. **Run the Initial Bootstrap**
+2. **Install Pre-commit Hooks**
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   ```
+3. **Run the Initial Bootstrap**
    ```bash
    python3 run_bootstrap.py
    ```
-3. **Explore the Blueprint** – Open `ARCHITECTURE.md` to see components and dependency rationales.
-4. **Watch It Evolve** – Each execution may introduce new tasks or propose refactors. Review and merge the generated commit.
+4. **Explore the Blueprint** – Open `ARCHITECTURE.md` to see components and dependency rationales.
+5. **Watch It Evolve** – Each execution may introduce new tasks or propose refactors. Review and merge the generated commit.
 
 ---
 

@@ -127,29 +127,24 @@ class Planner:
 ```
 
 ### Executor
-The `Executor` is responsible for carrying out a given task. Currently, its `execute` method is a basic implementation. It takes a task object and prints its `description` attribute to standard output. If the task lacks a `description` but has an `id`, it prints the ID with a notification. If neither is present, it prints a generic message.
+The `Executor` is responsible for carrying out a given task. It prints a short
+message describing the task and, when a `command` attribute is present, executes
+that command. The command's output is captured and written to a timestamped file
+inside the `logs/` directory.
 
 ```python
 class Executor:
-    """
-    A class responsible for executing tasks.
-    """
+    """Carry out a task and persist any command output."""
+
     def execute(self, task: object) -> None:
-        """
-        Executes a given task.
+        """Print a summary and optionally run ``task.command``.
 
-        For now, this method simply prints the task's description
-        to standard output. It assumes the task object has a 'description'
-        attribute.
-
-        Args:
-            task: The task object to execute. Expected to have a
-                  'description' attribute (e.g., task.description).
+        If ``task`` defines a ``command`` attribute it is executed using
+        ``subprocess.run`` with output captured. The text from stdout and stderr
+        is written to ``logs/task-<id>-<timestamp>.log``.
         """
-        # if hasattr(task, 'description'):
-        #     print(f"Executing task: {task.description}")
-        # ... Full method implementation as in core/executor.py
-        pass # Placeholder for brevity in markdown
+
+        # ... Full method implementation as in ``core/executor.py``
 ```
 
 ### SelfAuditor
@@ -252,6 +247,10 @@ flowchart TD
     C --> O[Create Orchestrator]
     O --> R[Orchestrator.run]
 ```
+
+### Diff Utility
+Utility functions ``generate_diff`` and ``generate_file_diff`` in
+``core.diff_utils`` emit unified diffs when file contents change.
 
 ## Dependencies
 - **PyYAML==6.0.1** - Safe YAML parsing

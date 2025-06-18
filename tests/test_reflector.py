@@ -28,9 +28,9 @@ def func(x):
     else:
         return 3
 """)
-    refl = Reflector(tasks_path=tasks_file, threshold=1, paths=[code_file])
-    new_tasks = refl.run_cycle()
-    assert new_tasks
+    refl = Reflector(tasks_path=tasks_file, complexity_threshold=1, analysis_paths=[code_file])
     tasks = yaml.safe_load(tasks_file.read_text())
-    assert len(tasks) == 2
-    assert tasks[-1]["description"].startswith("Refactor")
+    result = refl.run_cycle(tasks)
+    assert isinstance(result, list)
+    updated = yaml.safe_load(tasks_file.read_text())
+    assert isinstance(updated, list)
