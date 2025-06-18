@@ -4,12 +4,13 @@ from typing import List
 from .task import Task
 
 
+
 class Orchestrator:
     """
     Coordinates the self-improving loop of task planning, execution, and reflection.
     """
 
-    def __init__(self, planner, executor, reflector, memory):
+    def __init__(self, planner, executor, reflector, memory, auditor):
         """
         Initializes the Orchestrator with necessary components.
 
@@ -18,11 +19,13 @@ class Orchestrator:
             executor: An instance of the Executor class.
             reflector: An instance of the Reflector class.
             memory: An instance of the Memory class for loading/saving tasks.
+            auditor: An instance of the SelfAuditor class.
         """
         self.planner = planner
         self.executor = executor
         self.reflector = reflector
         self.memory = memory
+        self.auditor = auditor
 
     def run(self, tasks_file: str = 'tasks.yml') -> None:
         """
@@ -93,5 +96,16 @@ class Orchestrator:
                 )
 
             print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' completed.")
+
+            # Run self-audit and append any generated refactor tasks
+            audit_results = self.auditor.audit([_to_dict(t) for t in tasks])
+            if audit_results:
+                fields = set(Task.__dataclass_fields__.keys())
+                new_tasks = [
+                    Task(**{k: v for k, v in item.items() if k in fields})
+                    for item in audit_results
+                ]
+                tasks.extend(new_tasks)
+                self.memory.save_tasks(tasks, tasks_file)
 
         print("Orchestrator: Run finished.")
