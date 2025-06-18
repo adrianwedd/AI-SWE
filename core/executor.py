@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import shlex
 from datetime import datetime
 from pathlib import Path
 
@@ -33,9 +34,8 @@ class Executor:
         if not command:
             return
 
-        result = subprocess.run(
-            command, shell=True, capture_output=True, text=True
-        )
+        args = shlex.split(command)
+        result = subprocess.run(args, capture_output=True, text=True)
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         log_dir = Path("logs")
         log_dir.mkdir(exist_ok=True)
