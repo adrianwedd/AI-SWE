@@ -6,8 +6,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import yaml
 from jsonschema import validate, ValidationError
+from core.memory import TASK_SCHEMA
 
 
 def load_schema_and_tasks(path: Path):
@@ -22,7 +25,9 @@ def load_schema_and_tasks(path: Path):
     -------
     tuple
         Parsed JSON schema and list of task dictionaries. Exits with code
-        ``2`` if the file cannot be read or ``1`` for parsing errors.
+        ``2`` if the file cannot be read or ``1`` for parsing errors. If no
+        ``# jsonschema:`` header is present in the file, the default schema in
+        ``core.memory.TASK_SCHEMA`` is used.
     """
     try:
         text = path.read_text()
@@ -43,12 +48,15 @@ def load_schema_and_tasks(path: Path):
             continue
         task_lines.append(line)
 
-    schema_str = "\n".join(schema_lines)
-    try:
-        schema = json.loads(schema_str)
-    except json.JSONDecodeError as exc:
-        logging.error("[ERROR] %s", exc)
-        sys.exit(1)
+    if schema_lines:
+        schema_str = "\n".join(schema_lines)
+        try:
+            schema = json.loads(schema_str)
+        except json.JSONDecodeError as exc:
+            logging.error("[ERROR] %s", exc)
+            sys.exit(1)
+    else:
+        schema = TASK_SCHEMA
 
     try:
         tasks = yaml.safe_load("\n".join(task_lines)) or []

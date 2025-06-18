@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from core.bootstrap import load_schema_and_tasks  # noqa: E402
+from core.memory import TASK_SCHEMA
 
 
 def test_artifacts_exist():
@@ -60,4 +61,20 @@ def test_load_schema_and_tasks(tmp_path):
     path.write_text(content)
     schema, tasks = load_schema_and_tasks(path)
     assert schema["type"] == "array"
+    assert tasks[0]["id"] == 1
+
+
+def test_load_schema_and_tasks_without_header(tmp_path):
+    content = (
+        "- id: 1\n"
+        "  description: test\n"
+        "  component: core\n"
+        "  dependencies: []\n"
+        "  priority: 1\n"
+        "  status: pending\n"
+    )
+    path = tmp_path / "tasks.yml"
+    path.write_text(content)
+    schema, tasks = load_schema_and_tasks(path)
+    assert schema == TASK_SCHEMA
     assert tasks[0]["id"] == 1
