@@ -16,7 +16,17 @@ def main():
     for task in tasks:
         command = task.get("command")
         if command:
-            subprocess.run(command, shell=True, check=False)
+            result = subprocess.run(
+                command, shell=True, check=False, capture_output=True, text=True
+            )
+            requests.post(
+                f"{BROKER_URL}/tasks/{task['id']}/result",
+                json={
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "exit_code": result.returncode,
+                },
+            ).raise_for_status()
 
 
 if __name__ == "__main__":
