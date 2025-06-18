@@ -157,8 +157,9 @@ refactor suggestion.
 
 ```python
 class SelfAuditor:
-    def __init__(self, threshold: int = 15):
+    def __init__(self, threshold: int = 15, use_wily: bool = False):
         self.threshold = threshold
+        self.use_wily = use_wily
 
     def analyze(self, paths):
         """Return a mapping of file paths to radon metrics."""
@@ -166,6 +167,11 @@ class SelfAuditor:
     def audit(self, tasks):
         """Return new task entries when complexity exceeds ``self.threshold``."""
 ```
+
+When ``use_wily`` is enabled the auditor runs ``wily build`` to update the
+history cache and reads metrics from the previous revision. The difference in
+complexity influences task priority—files getting worse are prioritised while
+improvements lower the urgency.
 
 After each execution cycle the `Orchestrator` calls `SelfAuditor.audit()` with
 the current task list. Any returned entries are appended through the `Planner`,
