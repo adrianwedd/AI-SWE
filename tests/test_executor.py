@@ -115,7 +115,7 @@ class TestExecutor(unittest.TestCase):
                     dependencies=[],
                     priority=1,
                     status="pending",
-                    command="echo hello",
+                    command="echo 'hello there'",
                 )
                 self.executor.execute(task)
             finally:
@@ -123,7 +123,7 @@ class TestExecutor(unittest.TestCase):
 
             logs = list(Path(tmpdir).joinpath("logs").glob("task-cmd-*.log"))
             assert logs, "Log file not created"
-            assert logs[0].read_text().strip() == "hello"
+            assert logs[0].read_text().strip() == "hello there"
 
 
 if __name__ == '__main__':
