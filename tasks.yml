@@ -393,3 +393,58 @@
         task_ids:
         - 33
         - 50
+- id: 53
+  description: Document strategic research roadmap (RB-002)
+  component: docs
+  dependencies: []
+  priority: 2
+  status: pending
+- id: 54
+  description: Outline Vision Engine prioritization research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 55
+  description: Outline cross-language architecture research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 56
+  description: Outline metrics and observability research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 57
+  description: Outline plugin governance research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 58
+  description: Outline ethical sentinel policy research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 59
+  description: Outline self-improvement optimization research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
+- id: 60
+  description: Outline community and ecosystem mapping research
+  component: research
+  dependencies:
+  - 53
+  priority: 3
+  status: pending
