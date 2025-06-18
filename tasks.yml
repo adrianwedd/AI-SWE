@@ -64,3 +64,21 @@
   dependencies: [2]
   priority: 4
   status: done
+- id: 9
+  description: Implement SelfAuditor skeleton using radon metrics
+  component: auditor
+  dependencies: []
+  priority: 2
+  status: pending
+- id: 10
+  description: Integrate wily history tracking into SelfAuditor
+  component: auditor
+  dependencies: [9]
+  priority: 3
+  status: pending
+- id: 11
+  description: Orchestrator generates refactor tasks when SelfAuditor thresholds exceeded
+  component: orchestrator
+  dependencies: [9]
+  priority: 2
+  status: pending
