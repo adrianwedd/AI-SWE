@@ -8,7 +8,12 @@ from radon.complexity import cc_visit
 class Reflector:
     """Perform a simple self-improvement cycle."""
 
-    def __init__(self, tasks_path: Path | str = Path("tasks.yml"), threshold: int = 10, paths=None):
+    def __init__(
+        self,
+        tasks_path: Path | str = Path("tasks.yml"),
+        threshold: int = 10,
+        paths=None,
+    ):
         self.tasks_path = Path(tasks_path)
         self.threshold = threshold
         self.paths = [Path(p) for p in paths] if paths else None

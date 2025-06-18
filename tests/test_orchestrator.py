@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from core.orchestrator import Orchestrator
-from core.memory import Memory
+from core.orchestrator import Orchestrator  # noqa: E402
+from core.memory import Memory  # noqa: E402
 
 
 def test_orchestrator_run(capsys, tmp_path):
