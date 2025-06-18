@@ -69,6 +69,30 @@
   component: auditor
   dependencies: []
   priority: 2
+  status: in_progress
+- id: 12
+  description: Add radon dependency to requirements
+  component: auditor
+  dependencies: [9]
+  priority: 2
+  status: pending
+- id: 13
+  description: Implement analyze() in SelfAuditor using radon APIs
+  component: auditor
+  dependencies: [12]
+  priority: 2
+  status: pending
+- id: 14
+  description: Implement audit() generating refactor tasks when thresholds exceeded
+  component: auditor
+  dependencies: [13]
+  priority: 3
+  status: pending
+- id: 15
+  description: Add unit tests for SelfAuditor analyze and audit methods
+  component: testing
+  dependencies: [14]
+  priority: 3
   status: pending
 - id: 10
   description: Integrate wily history tracking into SelfAuditor
