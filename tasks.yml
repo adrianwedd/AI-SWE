@@ -172,3 +172,21 @@
   dependencies: []
   priority: 3
   status: pending
+- id: 27
+  description: Pin wily dependency in requirements.txt
+  component: deps
+  dependencies: []
+  priority: 2
+  status: done
+- id: 28
+  description: Implement analyze() in SelfAuditor using radon
+  component: code
+  dependencies: [13]
+  priority: 3
+  status: done
+- id: 29
+  description: Add tests covering SelfAuditor.analyze and audit
+  component: tests
+  dependencies: [28]
+  priority: 3
+  status: done
