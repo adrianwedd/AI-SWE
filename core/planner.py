@@ -1,9 +1,61 @@
-"""Simple decision maker selecting the next task."""
-
-
 class Planner:
-    """Determine the next action based on available tasks."""
+    """
+    A class that plans the execution order of tasks.
+    It prioritizes tasks based on their priority and dependencies.
+    """
 
-    def plan(self, tasks):
-        """Return the task to execute next from ``tasks``."""
-        pass
+    def plan(self, tasks: list) -> object | None:
+        """
+        Determines the next task to execute based on priority and dependencies.
+
+        Tasks with higher priority are selected first.
+        Tasks with dependencies are only selected if all their dependent tasks
+        have a status of "done".
+
+        Args:
+            tasks: A list of task objects. Each task object is expected to have
+                   at least the following attributes:
+                   - id (any): A unique identifier for the task.
+                   - priority (int): The priority of the task (higher value means higher priority).
+                   - dependencies (list): A list of task IDs that this task depends on.
+                   - status (str): The current status of the task (e.g., "todo", "done").
+
+        Returns:
+            The next task object to execute, or None if no tasks can be
+            executed (e.g., all tasks are done, or pending tasks have unmet
+            dependencies).
+        """
+        # Filter tasks that are "pending"
+        pending_tasks = [task for task in tasks if hasattr(task, 'status') and task.status == "pending"]
+
+        if not pending_tasks:
+            return None
+
+        ready_tasks = []
+        for task in pending_tasks:
+            if not hasattr(task, 'dependencies') or not task.dependencies:
+                # Task has no dependencies
+                ready_tasks.append(task)
+                continue
+
+            dependencies_met = True
+            for dep_id in task.dependencies:
+                # Find the dependent task in the original list
+                dependent_task = next((t for t in tasks if hasattr(t, 'id') and t.id == dep_id), None)
+
+                # If a dependency is not found or not "done", it's not met
+                if not dependent_task or not hasattr(dependent_task, 'status') or dependent_task.status != "done":
+                    dependencies_met = False
+                    break
+
+            if dependencies_met:
+                ready_tasks.append(task)
+
+        if not ready_tasks:
+            return None
+
+        # Sort ready tasks by priority (highest first)
+        # Assumes tasks in ready_tasks have 'priority' attribute
+        ready_tasks.sort(key=lambda t: getattr(t, 'priority', 0), reverse=True)
+
+        return ready_tasks[0]
