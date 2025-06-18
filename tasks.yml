@@ -171,4 +171,22 @@
   component: deps
   dependencies: []
   priority: 3
-  status: pending
+  status: done
+- id: 27
+  description: Add flake8 configuration and fix style errors
+  component: code
+  dependencies: [26]
+  priority: 2
+  status: done
+- id: 28
+  description: Add pre-commit configuration running flake8 and pylint
+  component: ci
+  dependencies: [27]
+  priority: 2
+  status: done
+- id: 29
+  description: Document flake8 and pre-commit usage in README
+  component: docs
+  dependencies: [28]
+  priority: 3
+  status: done
