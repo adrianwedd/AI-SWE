@@ -2,6 +2,7 @@
 
 import argparse
 from pathlib import Path
+import sys
 
 from .orchestrator import Orchestrator
 from .memory import Memory
@@ -27,13 +28,20 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     memory = Memory(Path(args.memory))
+    try:
+        memory.save(memory.load())
+    except Exception as exc:  # pragma: no cover - unexpected I/O errors
+        print(f"Error accessing memory: {exc}", file=sys.stderr)
+        return 1
+
     planner = Planner()
     executor = Executor()
     reflector = Reflector()
     orchestrator = Orchestrator(planner, executor, reflector, memory)
     print("Orchestrator running")
     orchestrator.run()
+    return 0
 
 
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    sys.exit(main())
