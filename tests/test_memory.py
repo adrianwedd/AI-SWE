@@ -2,6 +2,7 @@ from core.memory import Memory  # noqa: E402
 from core.task import Task
 import pytest
 from jsonschema.exceptions import ValidationError
+import yaml
 
 
 def test_memory_load_save(tmp_path):
@@ -38,3 +39,22 @@ def test_task_validation_error(tmp_path):
     mem = Memory(tmp_path / "state.json")
     with pytest.raises(ValidationError):
         mem.load_tasks(tasks_file)
+
+
+def test_save_tasks_omit_null_command(tmp_path):
+    tasks = [
+        Task(
+            id=1,
+            description="test command none",
+            component="core",
+            dependencies=[],
+            priority=1,
+            status="pending",
+            command=None,
+        )
+    ]
+    tasks_file = tmp_path / "tasks.yml"
+    mem = Memory(tmp_path / "state.json")
+    mem.save_tasks(tasks, tasks_file)
+    data = yaml.safe_load(tasks_file.read_text())
+    assert "command" not in data[0]
