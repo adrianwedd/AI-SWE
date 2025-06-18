@@ -9,6 +9,7 @@ from .memory import Memory
 from .planner import Planner
 from .executor import Executor
 from .reflector import Reflector
+from .self_auditor import SelfAuditor
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -37,7 +38,8 @@ def main(argv=None):
     planner = Planner()
     executor = Executor()
     reflector = Reflector()
-    orchestrator = Orchestrator(planner, executor, reflector, memory)
+    auditor = SelfAuditor()
+    orchestrator = Orchestrator(planner, executor, reflector, memory, auditor)
     print("Orchestrator running")
     orchestrator.run()
     return 0

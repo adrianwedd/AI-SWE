@@ -8,6 +8,7 @@ from core.planner import Planner
 from core.executor import Executor
 from core.reflector import Reflector
 from core.memory import Memory
+from core.self_auditor import SelfAuditor
 from core.orchestrator import Orchestrator
 
 
@@ -18,12 +19,15 @@ class TestOrchestrator(unittest.TestCase):
         self.mock_executor = MagicMock(spec=Executor)
         self.mock_reflector = MagicMock(spec=Reflector)
         self.mock_memory = MagicMock(spec=Memory)
+        self.mock_auditor = MagicMock(spec=SelfAuditor)
+        self.mock_auditor.audit.return_value = []
 
         self.orchestrator = Orchestrator(
             planner=self.mock_planner,
             executor=self.mock_executor,
             reflector=self.mock_reflector,
-            memory=self.mock_memory
+            memory=self.mock_memory,
+            auditor=self.mock_auditor
         )
 
     def test_init_stores_dependencies(self):
@@ -31,6 +35,7 @@ class TestOrchestrator(unittest.TestCase):
         self.assertIs(self.orchestrator.executor, self.mock_executor)
         self.assertIs(self.orchestrator.reflector, self.mock_reflector)
         self.assertIs(self.orchestrator.memory, self.mock_memory)
+        self.assertIs(self.orchestrator.auditor, self.mock_auditor)
 
     def test_run_loop_full_cycle_one_task(self):
         tasks_file = "test_tasks.yml"
@@ -154,6 +159,33 @@ class TestOrchestrator(unittest.TestCase):
         self.mock_executor.execute.assert_called_once_with(task1_planned)
         self.assertEqual(task1_planned.status, "done") # Final status
         self.assertEqual(self.mock_memory.save_tasks.call_count, 3)
+
+    def test_auditor_generated_tasks_are_appended(self):
+        tasks_file = "audit.yml"
+        base_task = Task(id=1, description="base", component="core", dependencies=[], priority=1, status="pending")
+
+        self.mock_memory.load_tasks.return_value = [base_task]
+        self.mock_reflector.run_cycle.return_value = [base_task]
+        self.mock_planner.plan.side_effect = [base_task, None]
+
+        audit_task = {
+            "id": 2,
+            "description": "Refactor foo.py",
+            "component": "refactor",
+            "dependencies": [],
+            "priority": 2,
+            "status": "pending",
+        }
+        self.mock_auditor.audit.return_value = [audit_task]
+
+        with patch('builtins.print'):
+            self.orchestrator.run(tasks_file)
+
+        self.mock_auditor.audit.assert_called()
+        # After audit there should be an extra save with the new task appended
+        args = self.mock_memory.save_tasks.call_args_list[-1].args[0]
+        self.assertEqual(len(args), 2)
+        self.assertEqual(args[-1].description, "Refactor foo.py")
 
 
     def test_run_loop_no_tasks_from_memory_and_no_new_tasks_from_reflector(self):
