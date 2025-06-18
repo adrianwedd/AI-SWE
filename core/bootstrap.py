@@ -9,6 +9,19 @@ from jsonschema import validate, ValidationError
 
 
 def load_schema_and_tasks(path: Path):
+    """Return JSON schema and task list from ``tasks.yml``.
+
+    Parameters
+    ----------
+    path:
+        Location of the ``tasks.yml`` file.
+
+    Returns
+    -------
+    tuple
+        Parsed JSON schema and list of task dictionaries. Exits with code
+        ``2`` if the file cannot be read or ``1`` for parsing errors.
+    """
     try:
         text = path.read_text()
     except OSError as exc:
@@ -45,6 +58,11 @@ def load_schema_and_tasks(path: Path):
 
 
 def main():
+    """Bootstrap the system by validating ``tasks.yml``.
+
+    Returns exit codes ``0`` on success, ``1`` for validation errors and ``2``
+    for filesystem issues.
+    """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     logfile = Path("logs") / f"bootstrap-{timestamp}.log"
     try:

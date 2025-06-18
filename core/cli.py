@@ -6,6 +6,7 @@ from .memory import Memory
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Create and return the command line parser."""
     parser = argparse.ArgumentParser(description="AI-SWE orchestration CLI")
     parser.add_argument(
         "--memory",
@@ -16,6 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None):
+    """Run the orchestrator using arguments from ``argv``."""
     parser = build_parser()
     args = parser.parse_args(argv)
 
