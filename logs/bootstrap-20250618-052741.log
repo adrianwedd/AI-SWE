@@ -1,1 +1,0 @@
-INFO:root:Next task: {'id': 1, 'description': 'Implement YAML validation using jsonschema', 'component': 'bootstrap', 'dependencies': [], 'priority': 1, 'status': 'pending'}
