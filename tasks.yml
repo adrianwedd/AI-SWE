@@ -1,0 +1,41 @@
+# jsonschema: |
+#   {
+#     "$schema": "http://json-schema.org/draft-07/schema#",
+#     "type": "array",
+#     "items": {
+#       "type": "object",
+#       "required": ["id","description","component","dependencies","priority","status"],
+#       "properties": {
+#         "id": {"type": "integer"},
+#         "description": {"type": "string"},
+#         "component": {"type": "string"},
+#         "dependencies": {"type": "array","items":{"type":"integer"}},
+#         "priority": {"type": "integer","minimum":1,"maximum":5},
+#         "status": {"type":"string","enum":["pending","in_progress","done"]}
+#       }
+#     }
+#   }
+- id: 1
+  description: Implement YAML validation using jsonschema
+  component: bootstrap
+  dependencies: []
+  priority: 1
+  status: done
+- id: 2
+  description: Expand tests in tests/test_bootstrap.py
+  component: testing
+  dependencies: [1]
+  priority: 2
+  status: done
+- id: 3
+  description: Create AGENTS.md with repository guidelines for Codex
+  component: docs
+  dependencies: []
+  priority: 3
+  status: done
+- id: 4
+  description: Ensure tests check for AGENTS.md existence
+  component: testing
+  dependencies: [3]
+  priority: 4
+  status: done
