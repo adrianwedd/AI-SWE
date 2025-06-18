@@ -21,21 +21,18 @@
   dependencies: []
   priority: 1
   status: done
-
 - id: 2
   description: Expand tests in tests/test_bootstrap.py
   component: testing
   dependencies: [1]
   priority: 2
-  status: pending
-
+  status: done
 - id: 3
   description: Create AGENTS.md with repository guidelines for Codex
   component: docs
   dependencies: []
   priority: 3
   status: done
-  
 - id: 4
   description: Ensure tests check for AGENTS.md existence
   component: testing
