@@ -77,11 +77,12 @@ class Executor:
 ```
 
 ### SelfAuditor
-Inspects code quality metrics and generates refactor tasks when complexity is
-high. The initial implementation relies on **radon** to calculate cyclomatic
-complexity for Python modules. Historical tracking with **wily** will be added
-later. The auditor never mutates code directly; instead it returns a list of
-new tasks for the `Planner` to merge into `tasks.yml`.
+Evaluates code metrics and decides when refactors are required. Metrics are
+obtained via **radon** (cyclomatic complexity and maintainability index) and,
+optionally, **wily** for historical trends. The auditor never changes source
+files itself. Instead it returns task dictionaries that the `Planner` appends to
+`tasks.yml`. Each task describes the module, offending score and a brief
+refactor suggestion.
 
 ```python
 class SelfAuditor:
@@ -89,12 +90,16 @@ class SelfAuditor:
         self.threshold = threshold
 
     def analyze(self, paths):
-        """Return cyclomatic complexity metrics for ``paths`` using radon."""
+        """Return a mapping of file paths to radon metrics."""
 
     def audit(self, tasks):
-        """Inspect complexity and return new task dictionaries when limits
-        are exceeded."""
+        """Return new task entries when complexity exceeds ``self.threshold``."""
 ```
+
+After each execution cycle the `Orchestrator` calls `SelfAuditor.audit()` with
+the current task list. Any returned entries are appended through the `Planner`,
+which rewrites `tasks.yml` so that future iterations can schedule the
+recommended refactors.
 
 ### Reflector
 Coordinates a self-improvement cycle by scanning the repository and appending
