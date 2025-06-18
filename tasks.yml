@@ -171,4 +171,20 @@
   component: deps
   dependencies: []
   priority: 3
+  description: Implement SelfAuditor service producing refactor tasks
+  component: auditor
+  dependencies: []
+  priority: 2
+  status: pending
+- id: 25
+  description: Expose SelfAuditor command line interface for manual audits
+  component: cli
+  dependencies: [24]
+  priority: 3
+  status: pending
+- id: 26
+  description: Planner merges SelfAuditor generated tasks into tasks.yml
+  component: planner
+  dependencies: [24]
+  priority: 2
   status: pending
