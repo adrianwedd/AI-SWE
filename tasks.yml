@@ -168,12 +168,13 @@
   dependencies: []
   priority: 2
   status: done
+# flake8 and pre-commit settings are in `.pre-commit-config.yml` and `setup.cfg`
 - id: 26
   description: Configure flake8 and pre-commit for code style enforcement
   component: deps
   dependencies: []
   priority: 3
-  status: pending
+  status: done
 - id: 27
   description: Pin wily dependency in requirements.txt
   component: deps
