@@ -210,7 +210,13 @@ class SelfAuditor:
 
     # ------------------------------------------------------------------
     def audit(self, existing_tasks: List[Dict]) -> List[Dict]:
-        """Analyze repository and return new refactor tasks."""
+        """Analyze repository and return new refactor tasks.
+
+        A task is generated when either the cyclomatic complexity or
+        maintainability index of a module exceeds the configured
+        thresholds. Existing refactor tasks are ignored to avoid
+        duplicates.
+        """
 
         python_files = [f for f in Path(".").rglob("*.py") if "__pycache__" not in str(f)]
 
@@ -230,12 +236,15 @@ class SelfAuditor:
             max_complexity = file_metrics["max_complexity"]
             violations = file_metrics.get("complexity_violations", [])
 
+            mi = file_metrics["maintainability"]["mi"]
+            mi_rank = file_metrics["maintainability"]["rank"]
+
             if violations:
                 violation_details = (
                     f"Max complexity: {max_complexity}, Functions needing attention: {len(violations)}"
                 )
             else:
-                violation_details = f"Maintainability: {file_metrics['maintainability']['rank']}"
+                violation_details = f"Maintainability: {mi_rank}"
 
             task = {
                 "id": next_id,
@@ -248,6 +257,8 @@ class SelfAuditor:
                     "type": "refactor",
                     "filepath": filepath,
                     "max_complexity": max_complexity,
+                    "mi": mi,
+                    "mi_rank": mi_rank,
                     "violations": len(violations),
                     "generated_by": "SelfAuditor",
                 },
