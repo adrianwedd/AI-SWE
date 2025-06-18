@@ -1,3 +1,6 @@
+"""Simple decision maker selecting the next task."""
+
+
 class Planner:
     """Determine the next action based on available tasks."""
 

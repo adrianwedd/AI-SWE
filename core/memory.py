@@ -1,3 +1,5 @@
+"""Persistent storage utility for tasks and metadata."""
+
 from pathlib import Path
 import json
 

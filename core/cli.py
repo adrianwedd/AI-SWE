@@ -1,3 +1,5 @@
+"""Command line interface for AI-SWA orchestration."""
+
 import argparse
 from pathlib import Path
 

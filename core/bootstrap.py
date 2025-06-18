@@ -1,3 +1,5 @@
+"""Bootstrap the AI-SWA environment and validate tasks."""
+
 import json
 import logging
 import sys
