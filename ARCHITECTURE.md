@@ -181,6 +181,13 @@ recommended refactors.
 Coordinates a self-improvement cycle by scanning the repository and appending
 new tasks when code complexity exceeds a threshold.
 
+The `run_cycle` method performs the following steps:
+1. Collect a list of Python files to analyze.
+2. Compute cyclomatic complexity for each file.
+3. Load existing tasks from ``tasks.yml``.
+4. Create new refactor tasks when any file exceeds ``threshold``.
+5. Save the updated task list back to disk.
+
 ```python
 from pathlib import Path
 import yaml
