@@ -1,3 +1,6 @@
+"""Execution component running discrete tasks."""
+
+
 class Executor:
     """Execute planned tasks."""
 

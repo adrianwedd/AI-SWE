@@ -1,3 +1,5 @@
+"""Provide reflection utilities for self-improvement loops."""
+
 from __future__ import annotations
 
 from pathlib import Path
