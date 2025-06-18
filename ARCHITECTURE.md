@@ -259,6 +259,16 @@ retrieve an individual task by ID. The database path defaults to
 ``tasks.db`` but can be overridden via the ``DB_PATH`` environment
 variable.
 
+To run the broker inside a container build the image and publish port
+``8000``:
+
+```bash
+docker build -f broker/Dockerfile -t broker .
+docker run -p 8000:8000 broker
+```
+
+The container launches ``uvicorn broker.main:app``.
+
 ```python
 from fastapi import FastAPI
 import sqlite3
