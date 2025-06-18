@@ -96,6 +96,33 @@ class SelfAuditor:
         are exceeded."""
 ```
 
+### Reflector
+Coordinates a self-improvement cycle by scanning the repository and appending
+new tasks when code complexity exceeds a threshold.
+
+```python
+from pathlib import Path
+import yaml
+from radon.complexity import cc_visit
+
+
+class Reflector:
+    def __init__(self, tasks_path: Path, threshold: int = 10, paths=None):
+        self.tasks_path = Path(tasks_path)
+        self.threshold = threshold
+        self.paths = [Path(p) for p in paths] if paths else None
+
+    def run_cycle(self):
+        files = self.paths or list(Path('.').rglob('*.py'))
+        metrics = self._analyze(files)
+        tasks = self._load_tasks()
+        new = self._decide(metrics, tasks)
+        if new:
+            tasks.extend(new)
+            self._save_tasks(tasks)
+        return new
+```
+
 ## Bootstrapping Flow
 ```mermaid
 flowchart TD
