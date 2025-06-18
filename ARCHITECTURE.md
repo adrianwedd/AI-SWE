@@ -22,6 +22,24 @@ class Orchestrator:
         pass
 ```
 
+### CLI
+Provides a thin command line wrapper around the `Orchestrator`. The
+entrypoint defined in `core.cli` parses arguments, creates a `Memory`
+instance and then runs the orchestrator.
+
+```python
+from pathlib import Path
+from core.orchestrator import Orchestrator
+from core.memory import Memory
+
+def main(argv=None):
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    memory = Memory(Path(args.memory))
+    orchestrator = Orchestrator(None, None, None, memory)
+    orchestrator.run()
+```
+
 ### Memory
 Simple persistence helper for storing JSON state on disk. The API is a
 minimal pair of `load()` and `save()` methods which read from and write
@@ -74,6 +92,14 @@ flowchart TD
     C -- Yes --> E[Select highest priority pending task]
     E --> F[Log task]
     F --> G[Exit success]
+```
+
+## CLI Invocation Flow
+```mermaid
+flowchart TD
+    U[User] --> C[CLI parses arguments]
+    C --> O[Create Orchestrator]
+    O --> R[Orchestrator.run]
 ```
 
 ## Dependencies
