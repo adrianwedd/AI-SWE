@@ -78,7 +78,7 @@
   dependencies:
   - 13
   priority: 3
-  status: pending
+  status: done
 - id: 15
   description: Add unit tests for SelfAuditor analyze and audit methods
   component: testing
