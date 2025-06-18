@@ -77,10 +77,21 @@ class Executor:
 ```
 
 ### SelfAuditor
+Inspects code quality metrics and generates refactor tasks when complexity
+is high. Metrics are gathered using **radon** and optionally tracked over time
+with **wily**. The auditor does not change code directly; instead it returns a
+list of new tasks for the `Planner` to merge into `tasks.yml`.
+
 ```python
 class SelfAuditor:
-    def audit(self):
-        pass
+    def __init__(self, threshold: int = 15):
+        self.threshold = threshold
+
+    def analyze(self, paths):
+        """Return radon metrics for the given module paths."""
+
+    def audit(self, tasks):
+        """Inspect code and return new task dictionaries when limits are exceeded."""
 ```
 
 ## Bootstrapping Flow
@@ -106,6 +117,9 @@ flowchart TD
 - **PyYAML==6.0.1** - Safe YAML parsing
 - **pytest==7.4.0** - Test execution
 - **jsonschema==4.21.0** - Validate task schema
+- **radon==5.1.0** - Compute code complexity metrics
+- **wily==1.25.0** - Track complexity over Git history
+- **pylint==3.3.7** - Linting and style checks
 
 ## Persistence Strategy
 State such as tasks and logs are stored on disk. Tasks are kept in `tasks.yml` and
