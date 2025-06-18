@@ -1,6 +1,9 @@
 import unittest
 from dataclasses import asdict
 from unittest.mock import Mock, MagicMock, call, patch
+import yaml
+from pathlib import Path
+import tempfile
 from core.task import Task
 
 # Need to import the actual classes to be instantiated or mocked if type hints are used by Orchestrator
@@ -264,6 +267,58 @@ class TestOrchestrator(unittest.TestCase):
         # Thus, only one save (after reflection) should occur.
         self.assertEqual(self.mock_memory.save_tasks.call_count, 1)
         self.mock_memory.save_tasks.assert_called_once_with(initial_tasks, tasks_file)
+
+    def test_run_updates_tasks_file_after_reflection(self):
+        tmp_path = Path(tempfile.mkdtemp())
+        tasks_file = tmp_path / "tasks.yml"
+        state_file = tmp_path / "state.json"
+        memory = Memory(state_file)
+
+        base_task = Task(id=1, description="base", component="core", dependencies=[], priority=1, status="pending")
+        memory.save_tasks([base_task], tasks_file)
+
+        class DummyPlanner:
+            def __init__(self):
+                self.calls = 0
+
+            def plan(self, tasks):
+                if self.calls == 0:
+                    self.calls += 1
+                    return tasks[0]
+                return None
+
+        class DummyExecutor:
+            def execute(self, task):
+                pass
+
+        class DummyReflector:
+            def __init__(self):
+                self.called = False
+
+            def run_cycle(self, tasks):
+                self.called = True
+                tasks.append({
+                    "id": 2,
+                    "description": "reflector task",
+                    "component": "core",
+                    "dependencies": [],
+                    "priority": 1,
+                    "status": "pending",
+                })
+                return tasks
+
+        auditor = MagicMock(spec=SelfAuditor)
+        auditor.audit.return_value = []
+
+        orch = Orchestrator(DummyPlanner(), DummyExecutor(), DummyReflector(), memory, auditor)
+
+        with patch('builtins.print'):
+            orch.run(str(tasks_file))
+
+        data = yaml.safe_load(tasks_file.read_text())
+        assert len(data) == 2
+        assert data[0]['status'] == 'done'
+        assert data[1]['description'] == 'reflector task'
 
 
 if __name__ == '__main__':
