@@ -134,16 +134,5 @@
   description: Add unit tests for Reflector and its orchestration integration
   component: testing
   dependencies: [18, 19]
-# Reflective loop enhancements
-- id: 16
-  description: Introduce Reflector component to automate self-improvement cycles
-  component: reflector
-  dependencies: []
-  priority: 2
-  status: pending
-- id: 17
-  description: Add unit test for Reflector run_cycle
-  component: testing
-  dependencies: [16]
   priority: 3
   status: pending
