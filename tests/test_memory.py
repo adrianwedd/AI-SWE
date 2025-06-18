@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.memory import Memory  # noqa: E402
+from core.task import Task
 import pytest
 from jsonschema.exceptions import ValidationError
 
@@ -20,14 +21,14 @@ def test_memory_load_save(tmp_path):
 
 def test_task_load_save_yaml(tmp_path):
     tasks = [
-        {
-            "id": 1,
-            "description": "test",
-            "component": "core",
-            "dependencies": [],
-            "priority": 1,
-            "status": "pending",
-        }
+        Task(
+            id=1,
+            description="test",
+            component="core",
+            dependencies=[],
+            priority=1,
+            status="pending",
+        )
     ]
     tasks_file = tmp_path / "tasks.yml"
     mem = Memory(tmp_path / "state.json")

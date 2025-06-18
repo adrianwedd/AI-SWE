@@ -1,5 +1,9 @@
 """High-level coordinator for planner, executor and auditor."""
 
+from typing import List
+from dataclasses import asdict
+from .task import Task
+
 
 class Orchestrator:
     """
@@ -21,7 +25,7 @@ class Orchestrator:
         self.reflector = reflector
         self.memory = memory
 
-    def run(self, tasks_file: str = 'tasks.yml'):
+    def run(self, tasks_file: str = 'tasks.yml') -> None:
         """
         Runs the main orchestration loop.
 
@@ -35,18 +39,25 @@ class Orchestrator:
                               to which to save tasks. Defaults to 'tasks.yml'.
         """
         # Load initial tasks
-        # Assuming memory.load_tasks returns a list of task objects
-        tasks = self.memory.load_tasks(tasks_file)
+        # Load persisted tasks as ``Task`` objects
+        tasks: List[Task] = self.memory.load_tasks(tasks_file)
         if tasks is None:
             tasks = [] # Start with an empty list if loading fails or file doesn't exist
 
         # Run reflection cycle
         # Assuming reflector.run_cycle takes tasks, potentially modifies them or adds new ones,
         # and returns the updated list of tasks.
-        updated_tasks = self.reflector.run_cycle(tasks)
-        if updated_tasks is not None:
-            tasks = updated_tasks
-        self.memory.save_tasks(tasks, tasks_file) # Save after reflection
+        def _to_dict(t: Task) -> dict:
+            return {f: getattr(t, f) for f in Task.__dataclass_fields__ if hasattr(t, f)}
+
+        reflected = self.reflector.run_cycle([_to_dict(t) for t in tasks])
+        if reflected is not None:
+            if reflected and isinstance(reflected[0], Task):
+                tasks = reflected
+            else:
+                fields = set(Task.__dataclass_fields__.keys())
+                tasks = [Task(**{k: v for k, v in item.items() if k in fields}) for item in reflected]
+        self.memory.save_tasks(tasks, tasks_file)  # Save after reflection
 
         while True:
             next_task = self.planner.plan(tasks)

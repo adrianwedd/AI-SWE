@@ -1,6 +1,6 @@
 import unittest
-from types import SimpleNamespace
 from core.planner import Planner
+from core.task import Task
 
 class TestPlanner(unittest.TestCase):
 
@@ -11,7 +11,7 @@ class TestPlanner(unittest.TestCase):
         """Helper to create task-like objects."""
         if dependencies is None:
             dependencies = []
-        return SimpleNamespace(id=id, priority=priority, status=status, dependencies=dependencies, description=description)
+        return Task(id=id, priority=priority, status=status, dependencies=dependencies, description=description, component="test")
 
     def test_empty_tasks_list(self):
         self.assertIsNone(self.planner.plan([]), "Should return None for empty task list")
@@ -123,8 +123,8 @@ class TestPlanner(unittest.TestCase):
         self.assertIsNone(self.planner.plan(tasks_blocked), "Should return None if all pending tasks are blocked by missing deps")
 
     def test_task_with_no_dependencies_attribute(self):
-        task_no_deps_attr = SimpleNamespace(id="t_no_dep_attr", priority=10, status="pending", description="Test")
-        if hasattr(task_no_deps_attr, 'dependencies'): # Ensure it's not there
+        task_no_deps_attr = self._create_task("t_no_dep_attr", 10, "pending")
+        if hasattr(task_no_deps_attr, 'dependencies'):
             delattr(task_no_deps_attr, 'dependencies')
 
         selected_task = self.planner.plan([task_no_deps_attr])
@@ -137,7 +137,9 @@ class TestPlanner(unittest.TestCase):
         self.assertEqual(selected_task.id, "t_empty_deps", "Should select task with empty dependencies list")
 
     def test_task_object_without_priority_attribute_defaults_to_zero(self):
-        task_no_priority = SimpleNamespace(id="t_no_prio", status="pending", dependencies=[], description="Test")
+        task_no_priority = self._create_task("t_no_prio", 0, "pending", [])
+        if hasattr(task_no_priority, 'priority'):
+            delattr(task_no_priority, 'priority')
         task_with_priority_one = self._create_task("t_with_prio", 1, "pending")
 
         # Test order 1: no_priority first in list

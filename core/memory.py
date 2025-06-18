@@ -4,6 +4,9 @@ from pathlib import Path
 import json
 import yaml
 from jsonschema import validate
+from dataclasses import asdict
+from typing import List
+from .task import Task
 
 
 TASK_SCHEMA = {
@@ -29,6 +32,7 @@ TASK_SCHEMA = {
                 "type": "string",
                 "enum": ["pending", "in_progress", "done"],
             },
+            "command": {"type": ["string", "null"]},
         },
     },
 }
@@ -63,19 +67,22 @@ class Memory:
             json.dump(data, fh)
 
     # New helper methods for YAML task files
-    def load_tasks(self, tasks_file: str):
-        """Return tasks from a YAML file or an empty list."""
+    def load_tasks(self, tasks_file: str) -> List[Task]:
+        """Return list of :class:`Task` from a YAML file or an empty list."""
         path = Path(tasks_file)
         if not path.exists():
             return []
         with path.open("r") as fh:
-            tasks = yaml.safe_load(fh) or []
-        validate(instance=tasks, schema=TASK_SCHEMA)
+            tasks_data = yaml.safe_load(fh) or []
+        validate(instance=tasks_data, schema=TASK_SCHEMA)
+        fields = set(Task.__dataclass_fields__.keys())
+        tasks = [Task(**{k: v for k, v in item.items() if k in fields}) for item in tasks_data]
         return tasks
 
-    def save_tasks(self, tasks, tasks_file: str):
-        """Write tasks to ``tasks_file`` in YAML format."""
-        validate(instance=tasks, schema=TASK_SCHEMA)
+    def save_tasks(self, tasks: List[Task], tasks_file: str) -> None:
+        """Write list of :class:`Task` to ``tasks_file`` in YAML format."""
+        tasks_data = [{k: v for k, v in asdict(t).items() if v is not None} for t in tasks]
+        validate(instance=tasks_data, schema=TASK_SCHEMA)
         path = Path(tasks_file)
         with path.open("w") as fh:
-            yaml.safe_dump(tasks, fh, sort_keys=False)
+            yaml.safe_dump(tasks_data, fh, sort_keys=False)

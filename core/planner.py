@@ -1,10 +1,14 @@
+from typing import List, Optional
+from .task import Task
+
+
 class Planner:
     """
     A class that plans the execution order of tasks.
     It prioritizes tasks based on their priority and dependencies.
     """
 
-    def plan(self, tasks: list) -> object | None:
+    def plan(self, tasks: List[Task]) -> Optional[Task]:
         """
         Determines the next task to execute based on priority and dependencies.
 
@@ -13,15 +17,10 @@ class Planner:
         have a status of "done".
 
         Args:
-            tasks: A list of task objects. Each task object is expected to have
-                   at least the following attributes:
-                   - id (any): A unique identifier for the task.
-                   - priority (int): The priority of the task (higher value means higher priority).
-                   - dependencies (list): A list of task IDs that this task depends on.
-                   - status (str): The current status of the task (e.g., "todo", "done").
+            tasks: A list of :class:`Task` objects ordered arbitrarily.
 
         Returns:
-            The next task object to execute, or None if no tasks can be
+            The next :class:`Task` object to execute, or ``None`` if no tasks can be
             executed (e.g., all tasks are done, or pending tasks have unmet
             dependencies).
         """
