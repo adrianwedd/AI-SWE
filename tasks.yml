@@ -155,6 +155,22 @@
   priority: 3
   status: done
 - id: 24
+  description: Add missing module docstrings across core modules
+  component: docs
+  dependencies: []
+  priority: 2
+  status: done
+- id: 25
+  description: Set up GitHub Actions workflow to run pytest and pylint
+  component: ci
+  dependencies: []
+  priority: 2
+  status: pending
+- id: 26
+  description: Configure flake8 and pre-commit for code style enforcement
+  component: deps
+  dependencies: []
+  priority: 3
   description: Implement SelfAuditor service producing refactor tasks
   component: auditor
   dependencies: []
