@@ -252,6 +252,30 @@ flowchart TD
 Utility functions ``generate_diff`` and ``generate_file_diff`` in
 ``core.diff_utils`` emit unified diffs when file contents change.
 
+### Broker
+The broker is a lightweight FastAPI application that stores tasks in a
+SQLite database. It exposes REST endpoints to create and list tasks and
+retrieve an individual task by ID. The database path defaults to
+``tasks.db`` but can be overridden via the ``DB_PATH`` environment
+variable.
+
+```python
+from fastapi import FastAPI
+import sqlite3
+
+app = FastAPI()
+
+@app.post("/tasks")
+def create_task(task: Task):
+    ...
+```
+
+### Worker
+Workers run inside Docker containers and poll the broker for tasks.
+Each worker fetches the pending tasks via HTTP and executes any
+``command`` attribute inside an isolated sandbox. A minimal Dockerfile
+installs the project requirements and launches ``worker/main.py``.
+
 ## Dependencies
 - **PyYAML==6.0.1** - Safe YAML parsing
 - **pytest==7.4.0** - Test execution
