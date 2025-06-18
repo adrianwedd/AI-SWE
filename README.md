@@ -265,6 +265,8 @@ End of directives. Proceed.
 You have completed bootstrapping. Your mission now is to grow this codebase by
 working through the tasks in `tasks.yml` using an iterative cycle.
 
+**Commit Style**: Follow the `type(scope): description` format defined in `AGENTS.md`, e.g., `feat(core): add feature`.
+
 ### The Iteration Cycle: Plan, Document, Build, Test, Commit
 
 #### Step 1: Orient & Plan (Thinking Phase)
