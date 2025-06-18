@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # noqa: E402
-
 import yaml  # noqa: E402
 from core.reflector import Reflector  # noqa: E402
 
