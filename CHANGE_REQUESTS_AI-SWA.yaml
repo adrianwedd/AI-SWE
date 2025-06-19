@@ -1,0 +1,254 @@
+- id: CR-SWA-001
+  title: Add Reflective Critique Layer to Evaluator
+  phase: R&D
+  epic: Agent Self-Improvement
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Meta-Agent
+  rationale: |
+    Recursive self-improvement is unstable without bounded critique.
+    We propose a structured reflection schema post-task.
+  description: |
+    - Add `reflect()` method to Evaluator agent
+    - Store critiques in separate semantic memory stream
+    - Use meta-evaluator to score evaluator alignment
+  acceptance_criteria:
+    - Critique logs generated in 90% of executions
+    - No divergence from user prompt in >95% cases
+  dependencies: []
+- id: CR-SWA-002
+  title: Expand Memory Reconciliation Mechanism
+  phase: R&D
+  epic: Memory Architecture
+  category: Enhancement
+  effort: 5 pts
+  owner_hint: Architect-Agent
+  rationale: |
+    Conflicting memories lead to poor planning decisions.
+  description: |
+    - Implement version tagging for long-term memory files
+    - Introduce conflict resolution heuristic in Planner
+  acceptance_criteria:
+    - Memory conflicts resolved automatically in 80% of cases
+  dependencies:
+    - CR-SWA-001
+- id: CR-SWA-003
+  title: Sandbox Isolation for Tool-Runner
+  phase: Implementation
+  epic: Security
+  category: Bugfix
+  effort: 3 pts
+  owner_hint: Tool-Runner
+  rationale: |
+    Current execution environment allows unrestricted file access.
+  description: |
+    - Add filesystem sandbox using chroot or containerization
+    - Update Tool-Runner tests to cover restricted paths
+  acceptance_criteria:
+    - Tests confirm Tool-Runner cannot modify files outside workspace
+  dependencies: []
+- id: CR-SWA-004
+  title: Introduce Planner Cost Budgeting
+  phase: Implementation
+  epic: Resource Management
+  category: Enhancement
+  effort: 5 pts
+  owner_hint: Planner-Agent
+  rationale: |
+    Tool invocations need cost controls to prevent runaway usage.
+  description: |
+    - Track tool call costs in Planner state
+    - Abort plans exceeding predefined budget
+  acceptance_criteria:
+    - Planner emits warning when budget is 80% consumed
+  dependencies:
+    - CR-SWA-003
+- id: CR-SWA-005
+  title: Semantic Search for Researcher Agent
+  phase: R&D
+  epic: Knowledge Integration
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Researcher-Agent
+  rationale: |
+    Better retrieval improves plan quality and reduces hallucination.
+  description: |
+    - Integrate vector store for external research documents
+    - Implement semantic similarity search API
+  acceptance_criteria:
+    - Researcher returns relevant sources in under 2 seconds
+  dependencies: []
+- id: CR-SWA-006
+  title: Evaluator Scoring Heuristic Tuning
+  phase: Testing
+  epic: Agent Self-Improvement
+  category: Enhancement
+  effort: 5 pts
+  owner_hint: Evaluator-Agent
+  rationale: |
+    Existing heuristics overweight code coverage metrics.
+  description: |
+    - Add configuration file for heuristic weights
+    - Run A/B tests on different weighting schemes
+  acceptance_criteria:
+    - Selected heuristic improves task completion rate by 10%
+  dependencies:
+    - CR-SWA-001
+- id: CR-SWA-007
+  title: Observer Metrics Dashboard
+  phase: Implementation
+  epic: Observability
+  category: Enhancement
+  effort: 3 pts
+  owner_hint: Architect-Agent
+  rationale: |
+    Lack of visibility hampers troubleshooting of agent interactions.
+  description: |
+    - Create Grafana dashboard for key agent metrics
+    - Publish metrics via Prometheus exporter
+  acceptance_criteria:
+    - Dashboard shows Planner throughput and Evaluator scores in real time
+  dependencies: []
+- id: CR-SWA-008
+  title: Policy Enforcement Hooks
+  phase: Implementation
+  epic: Alignment
+  category: Enhancement
+  effort: 5 pts
+  owner_hint: Supervisor-Agent
+  rationale: |
+    Policies must be enforced consistently across agents.
+  description: |
+    - Insert policy check before executing any plan
+    - Log violations to dedicated audit file
+  acceptance_criteria:
+    - Policy violations abort execution and are logged
+  dependencies:
+    - CR-SWA-004
+- id: CR-SWA-009
+  title: Automatic Agent Version Upgrades
+  phase: Research
+  epic: System Evolution
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Architect-Agent
+  rationale: |
+    The platform should self-upgrade when new agent versions are available.
+  description: |
+    - Implement version discovery from trusted repository
+    - Add upgrade scheduler to orchestrator
+  acceptance_criteria:
+    - Upgrades can be triggered manually and logged
+  dependencies: []
+- id: CR-SWA-010
+  title: Slow Outer Loop Evolutionary Strategy
+  phase: Research
+  epic: Reflector Outer Loop
+  category: Enhancement
+  effort: 13 pts
+  owner_hint: Reflector-Agent
+  rationale: |
+    Long-term optimization requires exploring new architectures.
+  description: |
+    - Implement genetic algorithm to mutate inner-loop parameters
+    - Evaluate fitness using historical metric trends
+  acceptance_criteria:
+    - Outer loop runs offline and outputs best configuration
+  dependencies:
+    - CR-SWA-006
+- id: CR-SWA-011
+  title: Community Engagement Plan
+  phase: Planning
+  epic: Outreach
+  category: Documentation
+  effort: 2 pts
+  owner_hint: Documentation Agent
+  rationale: |
+    Growing a developer community ensures diverse contributions.
+  description: |
+    - Draft community guidelines and contribution tutorial
+    - Publish sample integrations with third-party frameworks
+  acceptance_criteria:
+    - Documentation merged and announced on project page
+  dependencies: []
+- id: CR-SWA-012
+  title: Gradual RL Authority Escalation
+  phase: Research
+  epic: Vision Engine RL
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Vision Agent
+  rationale: |
+    RL component should gain authority only after demonstrating value.
+  description: |
+    - Log RL suggestions in shadow mode
+    - Enable authority once suggestion acceptance exceeds threshold
+  acceptance_criteria:
+    - RL actions adopted in >50% of trials after evaluation
+  dependencies:
+    - CR-SWA-010
+- id: CR-SWA-013
+  title: Hybrid Vision Engine Documentation
+  phase: Documentation
+  epic: Vision Engine
+  category: Docs
+  effort: 3 pts
+  owner_hint: Documentation Agent
+  rationale: |
+    Existing architecture notes need a concise summary for new contributors.
+  description: |
+    - Summarize hybrid WSJF and RL design
+    - Add diagrams showing data flow
+  acceptance_criteria:
+    - Document referenced by README and ARCHITECTURE.md
+  dependencies:
+    - CR-SWA-012
+- id: CR-SWA-014
+  title: Plugin Certification Pipeline
+  phase: Implementation
+  epic: Ecosystem
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Supervisor-Agent
+  rationale: |
+    Third-party plugins require vetting for security and compatibility.
+  description: |
+    - Build automated checks for plugin submissions
+    - Generate certification report and badge
+  acceptance_criteria:
+    - All approved plugins display certification badge in registry
+  dependencies:
+    - CR-SWA-007
+- id: CR-SWA-015
+  title: Ethics Sentinel Integration
+  phase: Research
+  epic: Governance
+  category: Enhancement
+  effort: 8 pts
+  owner_hint: Ethical Sentinel
+  rationale: |
+    As autonomy increases, systemic safeguards are mandatory.
+  description: |
+    - Design sentinel agent to monitor actions for policy compliance
+    - Define appeal process for overridden decisions
+  acceptance_criteria:
+    - Sentinel flagged actions reviewed before merge
+  dependencies:
+    - CR-SWA-008
+- id: CR-SWA-016
+  title: Public API Exposure via FastAPI
+  phase: Implementation
+  epic: API Gateway
+  category: Enhancement
+  effort: 5 pts
+  owner_hint: Architect-Agent
+  rationale: |
+    External integrations require a stable API surface.
+  description: |
+    - Wrap core orchestrator functions in FastAPI routes
+    - Provide example client in documentation
+  acceptance_criteria:
+    - Basic end-to-end request executes a single plan via API
+  dependencies:
+    - CR-SWA-009
+
