@@ -608,3 +608,40 @@
   - 90
   priority: 3
   status: pending
+- id: 92
+  description: Document hybrid Vision Engine design and rollout plan
+  component: docs
+  dependencies:
+  - 86
+  - 87
+  priority: 3
+  status: pending
+- id: 93
+  description: Extend WSJF scoring with CLI support and tests
+  component: vision
+  dependencies:
+  - 86
+  priority: 3
+  status: pending
+- id: 94
+  description: Implement RL training pipeline using observability metrics
+  component: vision
+  dependencies:
+  - 87
+  - 85
+  priority: 3
+  status: pending
+- id: 95
+  description: Run RL agent in shadow mode and log suggestions
+  component: vision
+  dependencies:
+  - 94
+  priority: 3
+  status: pending
+- id: 96
+  description: Gradually enable RL authority based on performance gains
+  component: vision
+  dependencies:
+  - 95
+  priority: 3
+  status: pending
