@@ -49,6 +49,7 @@ class RLAgent:
 
     def __init__(self) -> None:
         self.history: List[Dict[str, List[int]]] = []
+        self.training_data: List[Dict[str, float]] = []
 
     def suggest(self, tasks: List[Task]) -> List[Task]:
         """Return refined ordering. Currently identity function."""
@@ -63,5 +64,6 @@ class RLAgent:
             }
         )
 
-    def train(self) -> None:  # pragma: no cover - placeholder for future training
-        pass
+    def train(self, metrics: Dict[str, float]) -> None:
+        """Collect ``metrics`` for offline training."""
+        self.training_data.append(metrics)

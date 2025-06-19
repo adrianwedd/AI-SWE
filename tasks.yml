@@ -630,7 +630,7 @@
   - 87
   - 85
   priority: 3
-  status: pending
+  status: done
 - id: 95
   description: Run RL agent in shadow mode and log suggestions
   component: vision
