@@ -1,3 +1,18 @@
+"""Task broker API backed by SQLite.
+
+The service exposes a minimal REST interface for managing tasks and their
+execution results:
+
+* ``POST /tasks`` creates a new task entry.
+* ``GET /tasks`` lists all tasks.
+* ``GET /tasks/{id}`` retrieves a single task.
+* ``POST /tasks/{id}/result`` stores stdout, stderr and exit code.
+
+All data is persisted in a SQLite database specified by ``DB_PATH``. Two tables
+are created on startup: ``tasks`` for task metadata and ``task_results`` for
+worker output.
+"""
+
 import os
 import sqlite3
 from fastapi import FastAPI, HTTPException
