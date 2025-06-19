@@ -148,7 +148,8 @@ Your mission is to parse this document, form your plan, and then execute the ins
             #         "component": {"type": "string"},
             #         "dependencies": {"type": "array","items":{"type":"integer"}},
             #         "priority": {"type": "integer","minimum":1,"maximum":5},
-            #         "status": {"type":"string","enum":["pending","in_progress","done"]}
+            #         "status": {"type":"string","enum":["pending","in_progress","done"]},
+            #         "command": {"type": ["string", "null"]}
             #       }
             #     }
             #   }
