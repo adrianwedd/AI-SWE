@@ -84,6 +84,7 @@ Planner decides what to build next. The Executor writes files and configures CI/
 2. Build a plugin or propose an improvement.
 3. Add tests and update the planner to include your feature.
 4. Submit a pull request with a clear rationale.
+5. See `CONTRIBUTING.md` for installing pinned dependencies and running tests.
 
 Ready to witness a software architect that codes, tests, and evolves itself? Dive in and help shape the future of autonomous development.
 
