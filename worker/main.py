@@ -9,12 +9,16 @@ an isolated subprocess. The worker then posts the command's ``stdout``,
 import os
 import requests
 import subprocess
+from core.telemetry import setup_telemetry
 
 BROKER_URL = os.environ.get("BROKER_URL", "http://broker:8000")
+setup_telemetry(service_name="worker", metrics_port=int(os.getenv("METRICS_PORT", "9001")))
 
 
 def fetch_tasks():
-    resp = requests.get(f"{BROKER_URL}/tasks")
+    api_key = os.getenv("API_KEY")
+    headers = {"X-API-Key": api_key} if api_key else {}
+    resp = requests.get(f"{BROKER_URL}/tasks", headers=headers)
     resp.raise_for_status()
     return resp.json()
 
@@ -27,6 +31,8 @@ def main():
             result = subprocess.run(
                 command, shell=True, check=False, capture_output=True, text=True
             )
+            api_key = os.getenv("API_KEY")
+            headers = {"X-API-Key": api_key} if api_key else {}
             requests.post(
                 f"{BROKER_URL}/tasks/{task['id']}/result",
                 json={
@@ -34,6 +40,7 @@ def main():
                     "stderr": result.stderr,
                     "exit_code": result.returncode,
                 },
+                headers=headers,
             ).raise_for_status()
 
 

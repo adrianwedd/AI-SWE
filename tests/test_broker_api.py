@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 
 def setup_module(module):
     os.environ["DB_PATH"] = str(Path(module.__file__).parent / "test.db")
+    os.environ["METRICS_PORT"] = "0"
     global broker
     import broker.main as broker_module
     broker = reload(broker_module)
@@ -20,6 +21,7 @@ def setup_module(module):
 
 def test_create_and_get_task(tmp_path):
     os.environ["DB_PATH"] = str(tmp_path / "api.db")
+    os.environ["METRICS_PORT"] = "0"
     broker = reload(__import__("broker.main", fromlist=["app", "init_db"]))
     client = TestClient(broker.app)
 
@@ -32,6 +34,25 @@ def test_create_and_get_task(tmp_path):
     resp = client.get(f"/tasks/{task_id}")
     assert resp.status_code == 200
     assert resp.json()["id"] == task_id
+
+
+def test_api_key(tmp_path):
+    os.environ["DB_PATH"] = str(tmp_path / "api.db")
+    os.environ["METRICS_PORT"] = "0"
+    os.environ["API_KEY"] = "secret"
+    broker = reload(__import__("broker.main", fromlist=["app", "init_db"]))
+    client = TestClient(broker.app)
+
+    resp = client.post("/tasks", json={"description": "demo"})
+    assert resp.status_code == 401
+
+    resp = client.post(
+        "/tasks",
+        json={"description": "demo"},
+        headers={"X-API-Key": "secret"},
+    )
+    assert resp.status_code == 200
+    os.environ.pop("API_KEY")
 
 
 @pytest.mark.skipif(shutil.which("docker") is None, reason="Docker not installed")

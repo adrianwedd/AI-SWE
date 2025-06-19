@@ -11,12 +11,14 @@ import worker.main as worker_module
 
 def setup_broker(tmp_path):
     os.environ["DB_PATH"] = str(tmp_path / "api.db")
+    os.environ["METRICS_PORT"] = "0"
     broker = reload(broker_module)
     return TestClient(broker.app)
 
 
 def run_worker(client, monkeypatch):
     os.environ["BROKER_URL"] = str(client.base_url)
+    os.environ["METRICS_PORT"] = "0"
     mod = reload(worker_module)
 
     def _get(url, *args, **kwargs):
