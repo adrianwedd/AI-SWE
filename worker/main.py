@@ -1,3 +1,11 @@
+"""Command-line worker that polls the broker for pending tasks.
+
+The script contacts the broker specified by ``BROKER_URL`` and retrieves any
+pending tasks. Each task may provide a shell ``command`` which is executed in
+an isolated subprocess. The worker then posts the command's ``stdout``,
+``stderr`` and ``exit_code`` back to the broker.
+"""
+
 import os
 import requests
 import subprocess
