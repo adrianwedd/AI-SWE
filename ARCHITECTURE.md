@@ -298,6 +298,18 @@ Each worker fetches the pending tasks via HTTP and executes any
 ``command`` attribute inside an isolated sandbox. A minimal Dockerfile
 installs the project requirements and launches ``worker/main.py``.
 
+### Vision Engine
+Ranks epics using Weighted Shortest Job First (WSJF) scores. An optional
+``RLAgent`` can refine this ordering. The agent begins in **shadow mode**
+where its suggestions are logged but not applied. Logged suggestions are
+stored in JSON lines so that offline training can analyse how the agent
+would have re-ranked tasks.
+
+The ``RLAgent`` tracks an ``authority`` value from ``0.0`` to ``1.0``. The
+``VisionEngine`` applies the agent's ordering to the top fraction of tasks
+equal to this authority. The value only increases when observed
+performance gains exceed a threshold, allowing gradual delegation.
+
 ## Dependencies
 - **PyYAML==6.0.1** - Safe YAML parsing
 - **pytest==7.4.0** - Test execution

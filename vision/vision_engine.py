@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Dict, Optional
+import json
 
 from core.task import Task
 
@@ -37,19 +39,29 @@ class VisionEngine:
 
     def _maybe_refine_with_rl(self, tasks: List[Task]) -> List[Task]:
         suggestions = self.rl_agent.suggest(tasks)
-        if self.shadow_mode:
+        if self.shadow_mode or self.rl_agent.authority <= 0:
             # Log but do not alter ordering
             self.rl_agent.record_shadow_result(tasks, suggestions)
             return tasks
-        return suggestions
+
+        if self.rl_agent.authority >= 1:
+            return suggestions
+
+        # Apply RL ordering to a fraction of tasks equal to authority
+        n = int(len(tasks) * self.rl_agent.authority)
+        top_rl = suggestions[:n]
+        remaining = [t for t in tasks if t not in top_rl]
+        return top_rl + remaining
 
 
 class RLAgent:
     """Minimal stub of an RL agent for prioritization."""
 
-    def __init__(self) -> None:
+    def __init__(self, history_path: Optional[Path] = None) -> None:
         self.history: List[Dict[str, List[int]]] = []
         self.training_data: List[Dict[str, float]] = []
+        self.history_path = Path(history_path) if history_path else None
+        self.authority: float = 0.0
 
     def suggest(self, tasks: List[Task]) -> List[Task]:
         """Return refined ordering. Currently identity function."""
@@ -57,13 +69,20 @@ class RLAgent:
 
     def record_shadow_result(self, baseline: List[Task], suggestion: List[Task]) -> None:
         """Store comparison between baseline and suggestion for offline training."""
-        self.history.append(
-            {
-                "baseline": [t.id for t in baseline],
-                "suggestion": [t.id for t in suggestion],
-            }
-        )
+        entry = {
+            "baseline": [t.id for t in baseline],
+            "suggestion": [t.id for t in suggestion],
+        }
+        self.history.append(entry)
+        if self.history_path:
+            with self.history_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(entry) + "\n")
 
     def train(self, metrics: Dict[str, float]) -> None:
         """Collect ``metrics`` for offline training."""
         self.training_data.append(metrics)
+
+    def update_authority(self, performance_gain: float, threshold: float = 0.05) -> None:
+        """Increase authority when ``performance_gain`` exceeds ``threshold``."""
+        if performance_gain > threshold:
+            self.authority = min(1.0, self.authority + performance_gain)
