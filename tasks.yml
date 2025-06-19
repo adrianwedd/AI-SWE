@@ -551,7 +551,7 @@
   dependencies:
   - 82
   priority: 3
-  status: pending
+  status: in_progress
 - id: 84
   description: Apply API Gateway and Database-per-Service patterns
   component: microservices
@@ -643,5 +643,42 @@
   component: vision
   dependencies:
   - 95
+  priority: 3
+  status: pending
+- id: 97
+  description: Define gRPC contract for Node IOService
+  component: microservices
+  dependencies:
+  - 83
+  priority: 3
+  status: pending
+- id: 98
+  description: Implement Node.js gRPC IOService server
+  component: microservices
+  dependencies:
+  - 97
+  priority: 3
+  status: pending
+- id: 99
+  description: Implement Python gRPC client for IOService
+  component: microservices
+  dependencies:
+  - 97
+  priority: 3
+  status: pending
+- id: 100
+  description: Add integration tests for Node IOService communication
+  component: testing
+  dependencies:
+  - 98
+  - 99
+  priority: 3
+  status: pending
+- id: 101
+  description: Document Node microservice setup in ARCHITECTURE.md
+  component: docs
+  dependencies:
+  - 98
+  - 99
   priority: 3
   status: done
