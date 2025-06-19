@@ -506,14 +506,14 @@
   component: observability
   dependencies: []
   priority: 3
-  status: pending
+  status: done
 - id: 80
   description: Store metrics in Prometheus and define Grafana dashboards as code
   component: observability
   dependencies:
   - 79
   priority: 3
-  status: pending
+  status: done
 - id: 81
   description: Feed collected metrics to Reflector as its reward signal
   component: reflector

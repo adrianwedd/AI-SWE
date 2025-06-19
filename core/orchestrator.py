@@ -1,6 +1,8 @@
 """High-level coordinator for planner, executor and auditor."""
 
 from typing import List
+from opentelemetry import metrics, trace
+
 from .task import Task
 
 
@@ -16,6 +18,11 @@ class Orchestrator:
         self.reflector = reflector
         self.memory = memory
         self.auditor = auditor
+        meter = metrics.get_meter_provider().get_meter(__name__)
+        self._runs = meter.create_counter(
+            "orchestrator_runs_total", description="Number of orchestrator loops"
+        )
+        self._tracer = trace.get_tracer(__name__)
 
     # ------------------------------------------------------------------
     def _task_to_dict(self, task: Task) -> dict:
@@ -69,17 +76,19 @@ class Orchestrator:
 
     def run(self, tasks_file: str = "tasks.yml") -> None:
         """Run the orchestration loop."""
+        attrs = {"tasks.file": tasks_file}
+        with self._tracer.start_as_current_span("orchestrator.run", attributes=attrs):
+            tasks: List[Task] = self._load_tasks(tasks_file)
+            tasks = self._reflect(tasks, tasks_file)
 
-        tasks: List[Task] = self._load_tasks(tasks_file)
-        tasks = self._reflect(tasks, tasks_file)
+            while True:
+                next_task = self.planner.plan(tasks)
+                if next_task is None:
+                    print("Orchestrator: No actionable tasks. Halting.")
+                    break
 
-        while True:
-            next_task = self.planner.plan(tasks)
-            if next_task is None:
-                print("Orchestrator: No actionable tasks. Halting.")
-                break
+                print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' selected for execution.")
+                self._execute_task(next_task, tasks, tasks_file)
+                self._runs.add(1)
 
-            print(f"Orchestrator: Task '{getattr(next_task, 'id', 'N/A')}' selected for execution.")
-            self._execute_task(next_task, tasks, tasks_file)
-
-        print("Orchestrator: Run finished.")
+            print("Orchestrator: Run finished.")

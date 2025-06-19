@@ -4,10 +4,23 @@ import subprocess
 import shlex
 from datetime import datetime
 from pathlib import Path
+import time
+
+from opentelemetry import metrics, trace
 
 
 class Executor:
     """Carry out tasks and capture their output."""
+
+    def __init__(self) -> None:
+        meter = metrics.get_meter_provider().get_meter(__name__)
+        self._tasks_executed = meter.create_counter(
+            "tasks_executed_total", description="Number of executed tasks"
+        )
+        self._task_duration = meter.create_histogram(
+            "task_duration_seconds", description="Task execution duration"
+        )
+        self._tracer = trace.get_tracer(__name__)
 
     def execute(self, task: object) -> None:
         """Execute ``task`` and write any command output to ``logs/``.
@@ -34,10 +47,18 @@ class Executor:
         if not command:
             return
 
-        args = shlex.split(command)
-        result = subprocess.run(args, capture_output=True, text=True)
+        attrs = {"task.id": getattr(task, "id", "unknown")}
+        start_time = time.perf_counter()
+        with self._tracer.start_as_current_span("executor.execute", attributes=attrs):
+            args = shlex.split(command)
+            result = subprocess.run(args, capture_output=True, text=True)
+        duration = time.perf_counter() - start_time
+
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         log_dir = Path("logs")
         log_dir.mkdir(exist_ok=True)
         log_file = log_dir / f"task-{getattr(task, 'id', 'unknown')}-{timestamp}.log"
         log_file.write_text(result.stdout + result.stderr)
+
+        self._tasks_executed.add(1, attrs)
+        self._task_duration.record(duration, attrs)
