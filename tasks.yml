@@ -568,7 +568,7 @@
   - 82
   - 83
   priority: 3
-  status: pending
+  status: done
 - id: 86
   description: Implement Vision Engine prioritization using WSJF heuristics
   component: vision

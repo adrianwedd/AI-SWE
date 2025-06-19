@@ -15,12 +15,17 @@ worker output.
 
 import os
 import sqlite3
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from core.telemetry import setup_telemetry
+from core.security import verify_api_key
 
 DB_PATH = os.environ.get("DB_PATH", "tasks.db")
 
 app = FastAPI()
+setup_telemetry(service_name="broker", metrics_port=int(os.getenv("METRICS_PORT", "9000")))
+FastAPIInstrumentor.instrument_app(app)
 
 
 def get_db():
@@ -58,7 +63,7 @@ init_db()
 
 
 @app.post("/tasks", response_model=Task)
-def create_task(task: Task):
+def create_task(task: Task, _: None = Depends(verify_api_key)):
     conn = get_db()
     cur = conn.execute(
         "INSERT INTO tasks (description, status, command) VALUES (?, ?, ?)",
@@ -71,7 +76,7 @@ def create_task(task: Task):
 
 
 @app.get("/tasks", response_model=list[Task])
-def list_tasks():
+def list_tasks(_: None = Depends(verify_api_key)):
     conn = get_db()
     cur = conn.execute("SELECT id, description, status, command FROM tasks")
     tasks = [
@@ -88,7 +93,7 @@ def list_tasks():
 
 
 @app.get("/tasks/{task_id}", response_model=Task)
-def get_task(task_id: int):
+def get_task(task_id: int, _: None = Depends(verify_api_key)):
     conn = get_db()
     row = conn.execute(
         "SELECT id, description, status, command FROM tasks WHERE id = ?",
@@ -106,7 +111,7 @@ def get_task(task_id: int):
 
 
 @app.post("/tasks/{task_id}/result")
-def save_result(task_id: int, result: TaskResult):
+def save_result(task_id: int, result: TaskResult, _: None = Depends(verify_api_key)):
     conn = get_db()
     exists = conn.execute(
         "SELECT 1 FROM tasks WHERE id = ?", (task_id,)
