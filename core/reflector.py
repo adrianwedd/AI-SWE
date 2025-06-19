@@ -10,6 +10,7 @@ from typing import Dict, List, Optional
 import yaml
 
 from .self_auditor import SelfAuditor
+from .observability import MetricsProvider
 
 
 class Reflector:
@@ -20,11 +21,13 @@ class Reflector:
         tasks_path: Path = Path("tasks.yml"),
         complexity_threshold: int = 15,
         analysis_paths: Optional[List[Path]] = None,
+        metrics_provider: Optional["MetricsProvider"] = None,
     ) -> None:
         self.tasks_path = Path(tasks_path)
         self.complexity_threshold = complexity_threshold
         self.analysis_paths = analysis_paths or self._discover_analysis_paths()
         self.self_auditor = SelfAuditor(complexity_threshold=complexity_threshold)
+        self.metrics_provider = metrics_provider
         self.logger = logging.getLogger(__name__)
 
     # ------------------------------------------------------------------
@@ -70,6 +73,9 @@ class Reflector:
         analysis["system_health"] = self._analyze_system_health()
         analysis["evolution_trends"] = self._analyze_evolution_trends()
         analysis["strategic_insights"] = self._generate_strategic_insights(analysis)
+
+        if self.metrics_provider:
+            analysis["observability_metrics"] = self.metrics_provider.collect()
 
         return analysis
 

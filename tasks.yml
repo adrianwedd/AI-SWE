@@ -520,7 +520,7 @@
   dependencies:
   - 79
   priority: 3
-  status: pending
+  status: done
 - id: 82
   description: Introduce Rust modules via PyO3 for performance-critical code
   component: microservices
