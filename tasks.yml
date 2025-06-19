@@ -682,3 +682,41 @@
   - 99
   priority: 3
   status: done
+- id: 102
+  description: Add reflective critique layer to Evaluator
+  component: evaluator
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 103
+  description: Expand memory reconciliation mechanism
+  component: memory
+  dependencies:
+  - 102
+  priority: 3
+  status: pending
+- id: 104
+  description: Sandbox isolation for Tool-Runner
+  component: executor
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 105
+  description: Introduce Planner cost budgeting
+  component: planner
+  dependencies:
+  - 104
+  priority: 3
+  status: pending
+- id: 106
+  description: Semantic search for Researcher agent
+  component: research
+  dependencies: []
+  priority: 3
+  status: pending
+- id: 107
+  description: Observer metrics dashboard
+  component: observability
+  dependencies: []
+  priority: 3
+  status: pending
