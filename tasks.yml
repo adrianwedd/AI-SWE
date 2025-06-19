@@ -637,7 +637,7 @@
   dependencies:
   - 94
   priority: 3
-  status: pending
+  status: done
 - id: 96
   description: Gradually enable RL authority based on performance gains
   component: vision
@@ -681,4 +681,4 @@
   - 98
   - 99
   priority: 3
-  status: pending
+  status: done
