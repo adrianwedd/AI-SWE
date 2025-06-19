@@ -615,7 +615,7 @@
   - 86
   - 87
   priority: 3
-  status: pending
+  status: in_progress
 - id: 93
   description: Extend WSJF scoring with CLI support and tests
   component: vision

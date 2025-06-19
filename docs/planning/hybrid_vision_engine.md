@@ -11,12 +11,30 @@ The approach follows the strategy described in the research paper on Epic Priori
 
 Reference: lines 233–260 of `docs/research/Epic Prioritization_ RL vs Heuristics_.md`.
 
-## Proposed Tasks
+## Design Overview
 
-:::task-stub{title="Document hybrid Vision Engine design"}
-- Summarize WSJF scoring inputs and RL refinement logic.
-- Detail the shadow-mode deployment strategy.
-:::
+The hybrid Vision Engine has two layers:
+
+1. **WSJF baseline** – each epic is scored using the classic formula
+   `(User/Business Value + Time Criticality + RR\&OE) / Job Size`.
+   This provides a transparent ranking that can be justified to
+   stakeholders.
+2. **RL refinement** – a lightweight agent (initially SITP-based)
+   learns to slightly adjust the WSJF order. Its action space is a
+   re‑ranking of the top candidates rather than unrestricted backlog
+   manipulation. The reward function measures improvement over the
+   heuristic baseline to keep behaviour grounded and explainable.
+
+## Rollout Strategy
+
+1. **Heuristic only** – deploy WSJF scoring and record the resulting
+   decisions along with observability metrics.
+2. **Shadow-mode RL** – train the agent offline using the collected
+   data, then run it in parallel while logging its suggested rankings
+   without affecting live prioritization.
+3. **Gradual authority** – once the agent shows consistent improvements,
+   allow it to modify a small portion of the WSJF output. Increase this
+   percentage only when metrics continue to trend positively.
 
 :::task-stub{title="Extend WSJF scoring utilities"}
 - Provide CLI hooks for ranking epics using WSJF.
