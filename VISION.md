@@ -3,7 +3,7 @@
 ## Origin Components
 
 ### Vision Engine
-The Vision Engine is the imagined core of foresight. It seeded the repository with a guiding star, establishing goals around autonomous improvement and iterative architecture. By projecting future states and comparing them with the present, it continually refines objectives and priorities.
+The Vision Engine is the imagined core of foresight. It seeded the repository with a guiding star, establishing goals around autonomous improvement and iterative architecture. By projecting future states and comparing them with the present, it continually refines objectives and priorities. Prioritization begins with a transparent WSJF heuristic and is gradually refined by a reinforcement learning agent running in shadow mode.
 
 ### Reflector Core
 Reflector Core represents the system's ability to introspect. It tracks decisions, outcomes, and metrics to understand how each cycle affects the architecture. This feedback loop fuels learning, ensuring that every action becomes a data point for future planning.
@@ -18,7 +18,7 @@ The Creative Synthesizer explores novel solutions. It recombines existing patter
 The Ethical Sentinel guards against harmful behavior. It assesses new ideas and dependencies for security and ethical compliance, ensuring that self-evolution aligns with responsible AI principles.
 
 ## Next Steps
-- Clarify how the Vision Engine prioritizes epics over time.
+- Monitor WSJF scores and RL performance to tune prioritization.
 - Expand the Reflector Core with quantitative metrics.
 - Document decision mappings in the Intent Mapper.
 - Prototype a small Creative Synthesizer experiment.

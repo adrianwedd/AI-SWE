@@ -556,14 +556,14 @@
   component: vision
   dependencies: []
   priority: 3
-  status: pending
+  status: done
 - id: 87
   description: Train RL-based Vision Engine in shadow mode and gradually delegate control
   component: vision
   dependencies:
   - 86
   priority: 3
-  status: pending
+  status: done
 - id: 88
   description: Build fast PPO-aligned Reflector inner loop for continuous improvement
   component: reflector
