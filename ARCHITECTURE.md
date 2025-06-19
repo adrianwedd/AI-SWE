@@ -298,6 +298,15 @@ Each worker fetches the pending tasks via HTTP and executes any
 ``command`` attribute inside an isolated sandbox. A minimal Dockerfile
 installs the project requirements and launches ``worker/main.py``.
 
+### Node.js IOService
+Certain I/O-heavy functionality is offloaded to a lightweight Node.js
+microservice. Communication with the Python core occurs over gRPC to
+ensure a language-agnostic contract. The ``IOService`` exposes a simple
+``Ping`` RPC defined in ``proto/io_service.proto``. The Node server lives
+under ``services/node`` and is started independently. A small Python
+client in ``core.io_client`` allows the orchestrator or other modules to
+invoke this service when needed.
+
 ## Dependencies
 - **PyYAML==6.0.1** - Safe YAML parsing
 - **pytest==7.4.0** - Test execution

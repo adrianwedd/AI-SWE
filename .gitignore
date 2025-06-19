@@ -2,4 +2,7 @@ __pycache__/
 *.pyc
 logs/
 .pytest_cache/
+tasks.db
+tests/test.db
+services/node/node_modules/
 
